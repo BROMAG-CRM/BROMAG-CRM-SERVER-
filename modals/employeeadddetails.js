@@ -117,8 +117,12 @@ const addDetailsEmployeeSchema = mongoose.Schema({
       locationCity: { type: String },
       pinCode: { type: String },
       state: { type: String },
+
     },
   ],
+  location : {
+    type:Array
+  }
 });
 
 module.exports = mongoose.model(
