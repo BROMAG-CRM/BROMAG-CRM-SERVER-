@@ -18,7 +18,16 @@ const adminUserSchema = mongoose.Schema({
   city:{
     type:String,
   },
-  
+  adminId:{
+    type:String
+  },
+  isAdmin:{
+    type:Boolean,
+    default:false
+  },
+  state:{
+    type:String
+  }  
 
 });
 
