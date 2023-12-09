@@ -52,16 +52,10 @@ const getUsers = async (req, res) => {
     let query = {};
 
     if (isAdmin) {
-      const adminCity = req.user.name.split("@")[1];
-      query = { 
-        name: { $not: /^admin@/ }, 
-        city: adminCity
-      };
+      const adminId = req.user.userId;
+      query = { adminId: adminId };
     }
-
     const result = await Admin.find(query);
-    console.log("123455000");
-    console.log(result);
     return res.status(200).send({ data: result });
   } catch (e) {
     return res.status(500).send({ data: "Something went wrong while fetching the form" });
@@ -89,9 +83,65 @@ const updateUser = async (req, res) => {
 };
 
 
+// const getAssigned = async (req,res)=> {
+//   try {
+//     const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+
+//     let query = {};
+
+//     if (isAdmin) {
+//       const adminCity = req.user.name.split("@")[1];
+//       query = { city: adminCity}; 
+//     }
+
+//     const result = await Form.find(query);
+//     console.log(result);
+//     return res.status(200).send({ data: result });
+//   } catch (e) {
+//     return res.status(500).send({ data: "Something went wrong while fetching the form" });
+//   }
+// }
 
 
-module.exports={createForm,getForm,updateForm,getUsers,updateUser}
+const getAssigned = async (req, res) => {
+
+
+  try {
+    const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+
+    let query = {};
+
+    console.log("hiiii");
+
+
+    if (isAdmin) {
+      const adminCity = req.user.city
+      query = { city: adminCity, status: "Hot" }; 
+    }
+
+    const result = await Form.find(query)
+      .select({
+        brandName: 1,
+        restaurantMobileNumber: 1,
+        firmName: 1,
+        contactPersonname: 1,
+        designation: 1,
+        contactPersonNumber: 1,
+      });
+
+    console.log(result);
+
+    return res.status(200).send({ data: result });
+  } catch (e) {
+    return res.status(500).send({ data: "Something went wrong while fetching the form" });
+  }
+};
+
+
+
+
+
+module.exports={createForm,getForm,updateForm,getUsers,updateUser,getAssigned}
 
 
 

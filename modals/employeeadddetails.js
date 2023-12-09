@@ -122,6 +122,12 @@ const addDetailsEmployeeSchema = mongoose.Schema({
   ],
   location : {
     type:Array
+  },
+  employeeId : {
+    type:String
+  },
+  adminId:{
+    type:String
   }
 });
 
