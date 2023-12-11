@@ -20,12 +20,11 @@ const getForm = async (req, res) => {
     let query = {};
 
     if (isAdmin) {
-      const adminCity = req.user.name.split("@")[1];
-      query = { city: adminCity}; 
+      const adminId = req.user.userId
+      query = { adminId: adminId}; 
     }
 
     const result = await Form.find(query);
-    console.log(result);
     return res.status(200).send({ data: result });
   } catch (e) {
     return res.status(500).send({ data: "Something went wrong while fetching the form" });
@@ -82,44 +81,39 @@ const updateUser = async (req, res) => {
   }
 };
 
+const deleteUser = async (req, res) => {
+  const { id } = req.params;
 
-// const getAssigned = async (req,res)=> {
-//   try {
-//     const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+  try {
+    const result = await Admin.findByIdAndDelete(id);
 
-//     let query = {};
+    if (!result) {
+      return res.status(404).send("User not found");
+    }
 
-//     if (isAdmin) {
-//       const adminCity = req.user.name.split("@")[1];
-//       query = { city: adminCity}; 
-//     }
-
-//     const result = await Form.find(query);
-//     console.log(result);
-//     return res.status(200).send({ data: result });
-//   } catch (e) {
-//     return res.status(500).send({ data: "Something went wrong while fetching the form" });
-//   }
-// }
+    console.log(result);
+    console.log("User deleted successfully");
+    return res.status(200).json({ data: result });
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    return res.status(500).send("Something went wrong while deleting user");
+  }
+};
 
 
 const getAssigned = async (req, res) => {
-
-
   try {
     const isAdmin = req.user.name.toLowerCase().startsWith("admin");
 
     let query = {};
 
-    console.log("hiiii");
-
-
     if (isAdmin) {
-      const adminCity = req.user.city
-      query = { city: adminCity, status: "Hot" }; 
+      console.log(req.user);
+      const adminId = req.user.userId
+      query = { adminId: adminId, status: "Hot" }; 
     }
 
-    const result = await Form.find(query)
+    const forms = await Form.find(query)
       .select({
         brandName: 1,
         restaurantMobileNumber: 1,
@@ -127,12 +121,49 @@ const getAssigned = async (req, res) => {
         contactPersonname: 1,
         designation: 1,
         contactPersonNumber: 1,
+        city: 1
       });
 
-    console.log(result);
+    const uniqueCitiesSet = new Set(forms.map(form => form.city));
+    const uniqueCities = Array.from(uniqueCitiesSet);
 
-    return res.status(200).send({ data: result });
+    console.log(uniqueCities);
+
+    return res.status(200).send({ data: { forms, uniqueCities } });
   } catch (e) {
+    console.error("Error fetching forms:", e);
+    return res.status(500).send({ data: "Something went wrong while fetching the form" });
+  }
+};
+
+
+const getAssignedData = async (req, res) => {
+  try {
+    const { city } = req.params;
+    console.log(city);
+    const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+
+    let query = {};
+
+    if (isAdmin) {
+      query = { city: city, status: "Hot" }; 
+    }
+
+    const forms = await Form.find(query)
+      .select({
+        brandName: 1,
+        restaurantMobileNumber: 1,
+        firmName: 1,
+        contactPersonname: 1,
+        designation: 1,
+        contactPersonNumber: 1,
+        city: 1
+      });
+      console.log(forms);
+
+    return res.status(200).send({ data:  forms });
+  } catch (e) {
+    console.error("Error fetching forms:", e);
     return res.status(500).send({ data: "Something went wrong while fetching the form" });
   }
 };
@@ -141,7 +172,9 @@ const getAssigned = async (req, res) => {
 
 
 
-module.exports={createForm,getForm,updateForm,getUsers,updateUser,getAssigned}
+
+
+module.exports={createForm,getForm,updateForm,getUsers,updateUser,getAssigned,deleteUser,getAssignedData}
 
 
 
