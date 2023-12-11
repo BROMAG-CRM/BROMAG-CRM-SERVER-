@@ -82,6 +82,9 @@ const addDetailsEmployeeSchema = mongoose.Schema({
   city: {
     type: String,
   },
+  state: {
+    type: String
+  },
   domain: {
     type: String,
   },
@@ -124,10 +127,12 @@ const addDetailsEmployeeSchema = mongoose.Schema({
     type:Array
   },
   employeeId : {
-    type:String
+    type:String,
+    required: true
   },
   adminId:{
-    type:String
+    type:String,
+    required: true
   }
 });
 

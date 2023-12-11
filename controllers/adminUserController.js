@@ -40,7 +40,8 @@ const getUser = async (req, res) => {
         mobileNumber: user.mobileNumber,
         email: user.email,
         city: user.city,
-        state: user.state
+        state: user.state,
+        adminId:user.adminId
       },
       process.env.SECRET_KEY,
       { expiresIn: "10000h" }
