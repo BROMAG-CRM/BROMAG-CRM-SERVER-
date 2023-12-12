@@ -133,6 +133,18 @@ const addDetailsEmployeeSchema = mongoose.Schema({
   adminId:{
     type:String,
     required: true
+  },
+  leadStatus: {
+    type: String
+  },
+  followupDate:{
+    type: String
+  },
+  followupTime:{
+    type:String
+  },
+  leadDescription:{
+    type:String
   }
 });
 
