@@ -140,7 +140,6 @@ const getAssigned = async (req, res) => {
 const getAssignedData = async (req, res) => {
   try {
     const { city } = req.params;
-    console.log(city);
     const isAdmin = req.user.name.toLowerCase().startsWith("admin");
 
     let query = {};
@@ -169,12 +168,91 @@ const getAssignedData = async (req, res) => {
 };
 
 
+const getNewLeadsData = async (req,res) => {
+  try {
+    const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+
+    let query = {};
+
+    if (isAdmin) {
+      const adminId = req.user.userId
+      query = { adminId: adminId, status: "Hot" }; 
+    }
+
+    const forms = await Form.find(query)
+      .select({
+        brandName: 1,
+        restaurantMobileNumber: 1,
+        firmName: 1,
+        contactPersonname: 1,
+        designation: 1,
+        contactPersonNumber: 1,
+        city: 1
+      });
+      console.log(forms);
+
+    return res.status(200).send({ data:  forms });
+  } catch (e) {
+    console.error("Error fetching forms:", e);
+    return res.status(500).send({ data: "Something went wrong while fetching the form" });
+  }
+}
+
+const updateLeadStatus = async(req,res)=> {
+  try {
+    const {value,id} = req.body
+    const result = await Form.updateOne(
+      { _id: id },
+      { $set: { leadStatus: value } }
+    );;
+    return res.status(200).json({ data: result });
+  } catch (error) {
+    console.error("Error updating description:", error);
+    return res.status(500).send("Something went wrong while updating description");
+  }
+}
+
+const updateLeadDescription =  async(req,res)=>{
+  try {
+    const {value,id} = req.body
+    const result = await Form.updateOne(
+      { _id: id },
+      { $set: { leadDescription: value } }
+    );;
+    return res.status(200).json({ data: result });
+  } catch (error) {
+    console.error("Error updating description:", error);
+    return res.status(500).send("Something went wrong while updating description");
+  }
+}
+
+
+const followUpDetails =  async(req,res)=>{
+  try {
+    const {time,date,id,value}= req.body
+
+    console.log(req.body);
+
+    const result = await Form.updateOne(
+      { _id: id },
+      { $set: {
+          leadStatus: value,
+          followupDate: date,
+          followupTime: time,
+        }, }
+    );;
+    return res.status(200).json({ data: result });
+  } catch (error) {
+    console.error("Error updating description:", error);
+    return res.status(500).send("Something went wrong while updating description");
+  }
+}
 
 
 
 
 
-module.exports={createForm,getForm,updateForm,getUsers,updateUser,getAssigned,deleteUser,getAssignedData}
+module.exports={createForm,getForm,updateForm,getUsers,updateUser,getAssigned,deleteUser,getAssignedData,getNewLeadsData,updateLeadStatus,updateLeadDescription,followUpDetails}
 
 
 
