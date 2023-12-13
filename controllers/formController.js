@@ -4,7 +4,6 @@ const Admin=require("../modals/adminUserModal")
 
 const createForm = async (req, res) => {
   try {
-    console.log(req.body,"lll")
     const result=await Form.create({...req.body})
     return res.status(200).send({data:result._id})
   } catch (e) {
@@ -34,7 +33,6 @@ const getForm = async (req, res) => {
 
 const updateForm=async(req,res)=>{
     const { id } = req.params;
-    console.log(req.body,"lkkl")
     try {
       const result = await Form.findByIdAndUpdate(id, { ...req.body });
       return res.status(200).send({ data: result });
