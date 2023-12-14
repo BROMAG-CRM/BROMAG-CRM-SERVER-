@@ -2,7 +2,14 @@
 
 const express = require('express');
 const router = express.Router();
-const { createForm, getForm, updateForm, getUsers, updateUser, getAssigned, deleteUser, getAssignedData, getNewLeadsData, updateLeadStatus, updateLeadDescription, followUpDetails } = require("../controllers/formController");
+
+const { createForm, getForm, updateForm, getUsers, 
+  updateUser, getAssigned, deleteUser,
+getAssignedData, getNewLeadsData, updateLeadStatus, 
+updateLeadDescription, followUpDetails, 
+getFollowupLeadsData,addFeature,getConnectedLeadsData,
+getNotConnectedLeadsData } = require("../controllers/formController");
+
 const Auth = require('../middleWare/authenticateUser');
 
 router.use(Auth);
@@ -19,6 +26,10 @@ router.post("/createform", createForm)
   .post("/updateleadstatus",updateLeadStatus)
   .post("/updatedescription",updateLeadDescription)
   .post("/followupdetails",followUpDetails)
+  .get("/getfollowupleadsdata",getFollowupLeadsData)
+  .post("/addfeature",addFeature)
+  .get("/connectedleadsdata",getConnectedLeadsData)
+  .get("/notconnectedleadsdata",getNotConnectedLeadsData)
   
 
 
