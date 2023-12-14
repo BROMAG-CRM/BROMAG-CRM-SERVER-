@@ -135,7 +135,8 @@ const addDetailsEmployeeSchema = mongoose.Schema({
     required: true
   },
   leadStatus: {
-    type: String
+    type: String,
+    default:"new-lead"
   },
   followupDate:{
     type: String
@@ -145,7 +146,13 @@ const addDetailsEmployeeSchema = mongoose.Schema({
   },
   leadDescription:{
     type:String
-  }
+  },
+  features:[{
+    featureName: { type: String },
+    featureDescription: { type: String },
+}]
+
+  
 });
 
 module.exports = mongoose.model(
