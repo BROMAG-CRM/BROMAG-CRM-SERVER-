@@ -382,6 +382,106 @@ const getNotConnectedLeadsData = async (req,res)=> {
 
 
 
+
+const hotLeadsData = async (req,res)=> {
+  try {
+    const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+
+    let query = {};
+
+    if (isAdmin) {
+      const adminId = req.user.userId
+      query = { adminId: adminId, status: "Hot" }; 
+    }
+
+    const forms = await Form.find(query)
+      .select({
+        brandName: 1,
+        restaurantMobileNumber: 1,
+        firmName: 1,
+        contactPersonname: 1,
+        designation: 1,
+        contactPersonNumber: 1,
+        city: 1,
+        leadDescription: 1,
+      });
+      console.log(forms);
+
+    return res.status(200).send({ data:  forms });
+  } catch (e) {
+    console.error("Error fetching forms:", e);
+    return res.status(500).send({ data: "Something went wrong while fetching the form" });
+  }
+}
+
+
+
+const warmLeadsData = async (req,res)=> {
+  try {
+    const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+
+    let query = {};
+
+    if (isAdmin) {
+      const adminId = req.user.userId
+      query = { adminId: adminId, status: "Warm" }; 
+    }
+
+    const forms = await Form.find(query)
+      .select({
+        brandName: 1,
+        restaurantMobileNumber: 1,
+        firmName: 1,
+        contactPersonname: 1,
+        designation: 1,
+        contactPersonNumber: 1,
+        city: 1,
+        leadDescription: 1,
+      });
+      console.log(forms);
+
+    return res.status(200).send({ data:  forms });
+  } catch (e) {
+    console.error("Error fetching forms:", e);
+    return res.status(500).send({ data: "Something went wrong while fetching the form" });
+  }
+}
+
+
+
+
+const coldLeadsData = async (req,res)=> {
+  try {
+    const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+
+    let query = {};
+
+    if (isAdmin) {
+      const adminId = req.user.userId
+      query = { adminId: adminId, status: "Cold" }; 
+    }
+
+    const forms = await Form.find(query)
+      .select({
+        brandName: 1,
+        restaurantMobileNumber: 1,
+        firmName: 1,
+        contactPersonname: 1,
+        designation: 1,
+        contactPersonNumber: 1,
+        city: 1,
+        leadDescription: 1,
+      });
+      console.log(forms);
+
+    return res.status(200).send({ data:  forms });
+  } catch (e) {
+    console.error("Error fetching forms:", e);
+    return res.status(500).send({ data: "Something went wrong while fetching the form" });
+  }
+}
+
+
 module.exports={
   createForm,getForm,updateForm,getUsers,
   updateUser,getAssigned,deleteUser,
@@ -389,7 +489,8 @@ module.exports={
   updateLeadStatus,updateLeadDescription,
   followUpDetails,getFollowupLeadsData,
   addFeature,getConnectedLeadsData,
-  getNotConnectedLeadsData}
+  getNotConnectedLeadsData,hotLeadsData,
+  warmLeadsData,coldLeadsData}
 
 
 

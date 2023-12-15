@@ -27,6 +27,10 @@ const adminUserSchema = mongoose.Schema({
   },
   state:{
     type:String
+  },
+  joiningDate:{
+    type:Date,
+    default:Date.now
   }  
 
 });
