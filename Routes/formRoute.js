@@ -8,7 +8,8 @@ const { createForm, getForm, updateForm, getUsers,
 getAssignedData, getNewLeadsData, updateLeadStatus, 
 updateLeadDescription, followUpDetails, 
 getFollowupLeadsData,addFeature,getConnectedLeadsData,
-getNotConnectedLeadsData } = require("../controllers/formController");
+getNotConnectedLeadsData,hotLeadsData,warmLeadsData,
+coldLeadsData } = require("../controllers/formController");
 
 const Auth = require('../middleWare/authenticateUser');
 
@@ -30,6 +31,9 @@ router.post("/createform", createForm)
   .post("/addfeature",addFeature)
   .get("/connectedleadsdata",getConnectedLeadsData)
   .get("/notconnectedleadsdata",getNotConnectedLeadsData)
+  .get("/hotleadsdata",hotLeadsData)
+  .get("/warmleadsdata",warmLeadsData)
+  .get("/coldleadsdata",coldLeadsData)
   
 
 
