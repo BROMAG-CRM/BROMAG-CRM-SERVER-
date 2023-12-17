@@ -7,11 +7,18 @@ const formRoute=require("./Routes/formRoute")
 const mongoose = require("mongoose")
 const cors=require("cors")
 
+
+
 app.use(cors())
 app.use(express.json())
 
 app.use("/",adminUserRoute)
 app.use("/",formRoute)
+
+const bodyParser = require('body-parser');
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
 
 mongoose.connect(process.env.MONGO_URI,{}).then(()=>{
     app.listen(PORT,()=>{
