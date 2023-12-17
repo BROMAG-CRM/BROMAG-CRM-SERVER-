@@ -8,7 +8,7 @@ getAssignedData, getNewLeadsData, updateLeadStatus,
 updateLeadDescription, followUpDetails, 
 getFollowupLeadsData,addFeature,getConnectedLeadsData,
 getNotConnectedLeadsData,hotLeadsData,warmLeadsData,
-coldLeadsData,uploadCallRecord } = require("../controllers/formController");
+coldLeadsData,uploadCallRecord,uploadImage } = require("../controllers/formController");
 
 
 
@@ -48,6 +48,7 @@ router.post("/createform", createForm)
   .get("/warmleadsdata",warmLeadsData)
   .get("/coldleadsdata",coldLeadsData)
   .post("/uploadcallrecord/:id", upload.single('file'), uploadCallRecord)
+  .post("/uploadimage",upload.single('file'),uploadImage)
   
 
 

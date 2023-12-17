@@ -1,7 +1,6 @@
 const Form=require("../modals/employeeadddetails")
 const Admin=require("../modals/adminUserModal")
 const { PutObjectCommand, S3Client } = require('@aws-sdk/client-s3');
-// const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
 
 
 const createForm = async (req, res) => {
@@ -534,6 +533,38 @@ const uploadCallRecord = async (req, res) => {
 };
 
 
+const uploadImage = async(req,res)=>{
+  
+    const { originalname, buffer } = req.file;
+  
+    const uniqueKey = (await generateRandomString(16)) + originalname;
+    console.log(uniqueKey);
+  
+    const s3Client = new S3Client({
+      region: 'ap-south-1',
+      credentials: {
+        accessKeyId: 'AKIAQXYD576UOVKPG4Z5',      
+        secretAccessKey: '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',
+      },
+    });
+    
+    try {
+      const response = await s3Client.send(
+        new PutObjectCommand({
+          Bucket: 'crms3-bucket',
+          Key: uniqueKey,
+          Body: buffer,
+        })
+      );
+      const fileUrl = `https://crms3-bucket.s3.ap-south-1.amazonaws.com/${uniqueKey}`;
+      console.log("File uploaded successfully:", fileUrl);
+  
+      res.json({ fileUrl });
+    } catch (error) {
+      console.error("Error uploading file to S3:", error);
+      res.status(500).json({ error: 'Failed to upload file' });
+    }
+  };
 
 
 module.exports={
@@ -544,7 +575,9 @@ module.exports={
   followUpDetails,getFollowupLeadsData,
   addFeature,getConnectedLeadsData,
   getNotConnectedLeadsData,hotLeadsData,
-  warmLeadsData,coldLeadsData,uploadCallRecord}
+  warmLeadsData,coldLeadsData,uploadCallRecord,
+  uploadImage
+}
 
 
 
