@@ -1,5 +1,7 @@
 const Form=require("../modals/employeeadddetails")
 const Admin=require("../modals/adminUserModal")
+const { PutObjectCommand, S3Client } = require('@aws-sdk/client-s3');
+// const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
 
 
 const createForm = async (req, res) => {
@@ -482,6 +484,58 @@ const coldLeadsData = async (req,res)=> {
 }
 
 
+
+async function generateRandomString(length) {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+  let result = '';
+  const charactersLength = characters.length;
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
+}
+
+
+
+const uploadCallRecord = async (req, res) => {
+  console.log("111111111111111100");
+
+  const { originalname, buffer } = req.file;
+
+  const uniqueKey = (await generateRandomString(16)) + originalname;
+  console.log(uniqueKey);
+
+  const s3Client = new S3Client({
+    region: 'ap-south-1',
+    credentials: {
+      accessKeyId: 'AKIAY4YMHWOQNHNR6CWP',
+      secretAccessKey: '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',
+    },
+  });
+  
+  try {
+    const response = await s3Client.send(
+      new PutObjectCommand({
+        Bucket: 'crm-s3bucket',
+        Key: uniqueKey,
+        Body: buffer,
+      })
+    );
+    // Log the URL of the uploaded file
+    const fileUrl = `https://crm-s3bucket.s3.ap-south-1.amazonaws.com/${uniqueKey}`;
+    console.log("File uploaded successfully:", fileUrl);
+
+    // Optionally, you can send the file URL as a response to the client
+    res.json({ fileUrl });
+  } catch (error) {
+    console.error("Error uploading file to S3:", error);
+    res.status(500).json({ error: 'Failed to upload file' });
+  }
+};
+
+
+
+
 module.exports={
   createForm,getForm,updateForm,getUsers,
   updateUser,getAssigned,deleteUser,
@@ -490,7 +544,7 @@ module.exports={
   followUpDetails,getFollowupLeadsData,
   addFeature,getConnectedLeadsData,
   getNotConnectedLeadsData,hotLeadsData,
-  warmLeadsData,coldLeadsData}
+  warmLeadsData,coldLeadsData,uploadCallRecord}
 
 
 

@@ -1,7 +1,6 @@
-
-
 const express = require('express');
 const router = express.Router();
+const multer = require('multer')
 
 const { createForm, getForm, updateForm, getUsers, 
   updateUser, getAssigned, deleteUser,
@@ -9,11 +8,25 @@ getAssignedData, getNewLeadsData, updateLeadStatus,
 updateLeadDescription, followUpDetails, 
 getFollowupLeadsData,addFeature,getConnectedLeadsData,
 getNotConnectedLeadsData,hotLeadsData,warmLeadsData,
-coldLeadsData } = require("../controllers/formController");
+coldLeadsData,uploadCallRecord } = require("../controllers/formController");
+
+
+
+
+
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+
+
+
 
 const Auth = require('../middleWare/authenticateUser');
 
 router.use(Auth);
+
+
+console.log("routeee");
 
 router.post("/createform", createForm)
   .get("/getform", getForm)
@@ -34,6 +47,7 @@ router.post("/createform", createForm)
   .get("/hotleadsdata",hotLeadsData)
   .get("/warmleadsdata",warmLeadsData)
   .get("/coldleadsdata",coldLeadsData)
+  .post("/uploadcallrecord/:id", upload.single('file'), uploadCallRecord)
   
 
 
