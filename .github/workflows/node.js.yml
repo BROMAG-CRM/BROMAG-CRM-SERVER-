@@ -29,4 +29,3 @@ jobs:
     - run: npm ci
     - run: cp /home/ubuntu/qacrmserenv/.env /home/ubuntu/qacrmserver/dev/BROMAG-CRM-SERVER-/BROMAG-CRM-SERVER-
     - run: pm2 restart qa
-  
