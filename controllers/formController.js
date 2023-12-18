@@ -586,7 +586,6 @@ const uploadImage = async(req,res)=>{
     const { originalname, buffer } = req.file;
   
     const uniqueKey = (await generateRandomString(16)) + originalname;
-    console.log(uniqueKey);
   
     const s3Client = new S3Client({
       region: 'ap-south-1',

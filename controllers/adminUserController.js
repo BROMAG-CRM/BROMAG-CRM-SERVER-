@@ -36,12 +36,12 @@ const getUser = async (req, res) => {
 
     const token = jwt.sign(
       {
-        userId: user._id,
-        name: user.name,
-        mobileNumber: user.mobileNumber,
+        userId: user?._id,
+        name: user?.name,
+        mobileNumber: user?.mobileNumber,
         email: user?.email,
-        city: user.city,
-        state: user.state,
+        city: user?.city,
+        state: user?.state,
         adminId:user?.adminId
       },
       process.env.SECRET_KEY,
