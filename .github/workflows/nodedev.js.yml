@@ -25,5 +25,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
     - run: npm ci
+    - run: cp /home/ubuntu/devenvserver/.env /home/ubuntu/devcrmserver/dev/BROMAG-CRM-SERVER-/BROMAG-CRM-SERVER-
+    - run: pm2 restart dev
   
     
