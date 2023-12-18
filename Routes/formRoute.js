@@ -3,12 +3,13 @@ const router = express.Router();
 const multer = require('multer')
 
 const { createForm, getForm, updateForm, getUsers, 
-  updateUser, getAssigned, deleteUser,
-getAssignedData, getNewLeadsData, updateLeadStatus, 
+  updateUser, getAssignedIndia, deleteUser,
+getAssignedData, getNewLeadsDataIndia, updateLeadStatus, 
 updateLeadDescription, followUpDetails, 
-getFollowupLeadsData,addFeature,getConnectedLeadsData,
-getNotConnectedLeadsData,hotLeadsData,warmLeadsData,
-coldLeadsData,uploadCallRecord,uploadImage } = require("../controllers/formController");
+getFollowupLeadsDataIndia,addFeature,getConnectedLeadsDataIndia,
+getNotConnectedLeadsDataIndia,hotLeadsData,warmLeadsData,
+coldLeadsData,uploadCallRecord,uploadImage,getAssignedBooks,
+ } = require("../controllers/formController");
 
 
 
@@ -33,17 +34,18 @@ router.post("/createform", createForm)
   .get("/getusers",getUsers)
   .put("/updateform/:id", updateForm)
   .post("/updateduser/:id",updateUser)
-  .get("/getassigned",getAssigned)
+  .get("/getassignedindia",getAssignedIndia)
+  .get("/getassignedbooks",getAssignedBooks)
   .delete("/deleteuser/:id",deleteUser)
   .get("/getassigneddata/:city",getAssignedData)
-  .get("/getnewleadsdata",getNewLeadsData)
+  .get("/getnewleadsdataindia",getNewLeadsDataIndia)
   .post("/updateleadstatus",updateLeadStatus)
   .post("/updatedescription",updateLeadDescription)
   .post("/followupdetails",followUpDetails)
-  .get("/getfollowupleadsdata",getFollowupLeadsData)
+  .get("/getfollowupleadsdataindia",getFollowupLeadsDataIndia)
   .post("/addfeature",addFeature)
-  .get("/connectedleadsdata",getConnectedLeadsData)
-  .get("/notconnectedleadsdata",getNotConnectedLeadsData)
+  .get("/connectedleadsdataindia",getConnectedLeadsDataIndia)
+  .get("/notconnectedleadsdataindia",getNotConnectedLeadsDataIndia)
   .get("/hotleadsdata",hotLeadsData)
   .get("/warmleadsdata",warmLeadsData)
   .get("/coldleadsdata",coldLeadsData)

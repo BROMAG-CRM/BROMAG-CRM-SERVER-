@@ -150,9 +150,11 @@ const addDetailsEmployeeSchema = mongoose.Schema({
   features:[{
     featureName: { type: String },
     featureDescription: { type: String },
-}]
+}],
+callRecord:{
+  type:String
+}
 
-  
 });
 
 module.exports = mongoose.model(
