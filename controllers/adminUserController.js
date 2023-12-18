@@ -21,7 +21,6 @@ const createUser = async (req, res) => {
 
 const getUser = async (req, res) => {
   try {
-    console.log(req.body);
     const { name, password } = req.body;
     const user = await User.findOne({ name });
 
@@ -41,7 +40,7 @@ const getUser = async (req, res) => {
         name: user.name,
         mobileNumber: user.mobileNumber,
         email: user?.email,
-        city: isAdmin? isAdmin.split('@')[1] : user.city,
+        city: user.city,
         state: user.state,
         adminId:user?.adminId
       },
