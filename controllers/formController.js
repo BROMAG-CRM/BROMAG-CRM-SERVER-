@@ -105,7 +105,7 @@ const deleteUser = async (req, res) => {
 };
 
 
-const getAssigned = async (req, res) => {
+const getAssignedIndia = async (req, res) => {
   try {
     const isAdmin = req.user.name.toLowerCase().startsWith("admin");
 
@@ -114,7 +114,7 @@ const getAssigned = async (req, res) => {
     if (isAdmin) {
       console.log(req.user);
       const adminId = req.user.userId
-      query = { adminId: adminId, status: "Hot" }; 
+      query = { adminId: adminId, status: "Hot",billingSoftware:"yes" }; 
     }
 
     const forms = await Form.find(query)
@@ -139,6 +139,43 @@ const getAssigned = async (req, res) => {
     return res.status(500).send({ data: "Something went wrong while fetching the form" });
   }
 };
+
+
+const getAssignedBooks = async (req, res) => {
+  try {
+    const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+
+    let query = {};
+
+    if (isAdmin) {
+      console.log(req.user);
+      const adminId = req.user.userId
+      query = { adminId: adminId, status: "Hot",billingSoftware:"no"}; 
+    }
+
+    const forms = await Form.find(query)
+      .select({
+        brandName: 1,
+        restaurantMobileNumber: 1,
+        firmName: 1,
+        contactPersonname: 1,
+        designation: 1,
+        contactPersonNumber: 1,
+        city: 1
+      });
+
+    const uniqueCitiesSet = new Set(forms.map(form => form.city));
+    const uniqueCities = Array.from(uniqueCitiesSet);
+
+    console.log(uniqueCities);
+
+    return res.status(200).send({ data: { forms, uniqueCities } });
+  } catch (e) {
+    console.error("Error fetching forms:", e);
+    return res.status(500).send({ data: "Something went wrong while fetching the form" });
+  }
+};
+
 
 
 const getAssignedData = async (req, res) => {
@@ -172,7 +209,7 @@ const getAssignedData = async (req, res) => {
 };
 
 
-const getNewLeadsData = async (req,res) => {
+const getNewLeadsDataIndia = async (req,res) => {
   try {
     const isAdmin = req.user.name.toLowerCase().startsWith("admin");
 
@@ -180,7 +217,7 @@ const getNewLeadsData = async (req,res) => {
 
     if (isAdmin) {
       const adminId = req.user.userId
-      query = { adminId: adminId, status: "Hot", leadStatus:"new-lead" }; 
+      query = { adminId: adminId, status: "Hot", leadStatus:"new-lead",billingSoftware:"yes" }; 
     }
 
     const forms = await Form.find(query)
@@ -253,7 +290,7 @@ const followUpDetails =  async(req,res)=>{
 }
 
 
-const getFollowupLeadsData = async(req,res)=> {
+const getFollowupLeadsDataIndia = async(req,res)=> {
   try {
     const isAdmin = req.user.name.toLowerCase().startsWith("admin");
 
@@ -261,7 +298,7 @@ const getFollowupLeadsData = async(req,res)=> {
 
     if (isAdmin) {
       const adminId = req.user.userId
-      query = { adminId: adminId, status: "Hot" ,leadStatus:"follow-up"}; 
+      query = { adminId: adminId, status: "Hot" ,leadStatus:"follow-up",billingSoftware:"yes"}; 
     }
 
     const forms = await Form.find(query)
@@ -312,7 +349,10 @@ const addFeature = async (req, res) => {
 
 
 
-const getConnectedLeadsData = async (req,res)=> {
+const getConnectedLeadsDataIndia = async (req,res)=> {
+
+
+  console.log("1111111connectee");
 
   try {
     const isAdmin = req.user.name.toLowerCase().startsWith("admin");
@@ -321,7 +361,7 @@ const getConnectedLeadsData = async (req,res)=> {
 
     if (isAdmin) {
       const adminId = req.user.userId
-      query = { adminId: adminId, status: "Hot", leadStatus:"connected" }; 
+      query = { adminId: adminId, status: "Hot", leadStatus:"connected", billingSoftware:"yes" }; 
     }
 
     const forms = await Form.find(query)
@@ -334,6 +374,7 @@ const getConnectedLeadsData = async (req,res)=> {
         contactPersonNumber: 1,
         city: 1,
         leadDescription: 1,
+        callRecord:1
       });
       console.log(forms);
 
@@ -348,7 +389,7 @@ const getConnectedLeadsData = async (req,res)=> {
 
 
 
-const getNotConnectedLeadsData = async (req,res)=> {
+const getNotConnectedLeadsDataIndia = async (req,res)=> {
 
   try {
     const isAdmin = req.user.name.toLowerCase().startsWith("admin");
@@ -357,7 +398,7 @@ const getNotConnectedLeadsData = async (req,res)=> {
 
     if (isAdmin) {
       const adminId = req.user.userId
-      query = { adminId: adminId, status: "Hot", leadStatus:"not-connected" }; 
+      query = { adminId: adminId, status: "Hot", leadStatus:"not-connected" ,billingSoftware:"yes" }; 
     }
 
     const forms = await Form.find(query)
@@ -499,6 +540,7 @@ async function generateRandomString(length) {
 const uploadCallRecord = async (req, res) => {
   console.log("111111111111111100");
 
+  const { id } = req.params;
   const { originalname, buffer } = req.file;
 
   const uniqueKey = (await generateRandomString(16)) + originalname;
@@ -524,8 +566,14 @@ const uploadCallRecord = async (req, res) => {
     const fileUrl = `https://crm-s3bucket.s3.ap-south-1.amazonaws.com/${uniqueKey}`;
     console.log("File uploaded successfully:", fileUrl);
 
+    await Form.updateOne(
+      { _id: id },
+      { $set: { callRecord: fileUrl} }
+    )
+
     // Optionally, you can send the file URL as a response to the client
     res.json({ fileUrl });
+
   } catch (error) {
     console.error("Error uploading file to S3:", error);
     res.status(500).json({ error: 'Failed to upload file' });
@@ -538,7 +586,6 @@ const uploadImage = async(req,res)=>{
     const { originalname, buffer } = req.file;
   
     const uniqueKey = (await generateRandomString(16)) + originalname;
-    console.log(uniqueKey);
   
     const s3Client = new S3Client({
       region: 'ap-south-1',
@@ -569,14 +616,14 @@ const uploadImage = async(req,res)=>{
 
 module.exports={
   createForm,getForm,updateForm,getUsers,
-  updateUser,getAssigned,deleteUser,
-  getAssignedData,getNewLeadsData,
+  updateUser,getAssignedIndia,deleteUser,
+  getAssignedData,getNewLeadsDataIndia,
   updateLeadStatus,updateLeadDescription,
-  followUpDetails,getFollowupLeadsData,
-  addFeature,getConnectedLeadsData,
-  getNotConnectedLeadsData,hotLeadsData,
+  followUpDetails,getFollowupLeadsDataIndia,
+  addFeature,getConnectedLeadsDataIndia,
+  getNotConnectedLeadsDataIndia,hotLeadsData,
   warmLeadsData,coldLeadsData,uploadCallRecord,
-  uploadImage
+  uploadImage,getAssignedBooks
 }
 
 

@@ -21,7 +21,6 @@ const createUser = async (req, res) => {
 
 const getUser = async (req, res) => {
   try {
-    console.log(req.body);
     const { name, password } = req.body;
     const user = await User.findOne({ name });
 
@@ -33,14 +32,16 @@ const getUser = async (req, res) => {
       return res.status(400).send({ message: "Incorrect password" });
     }
 
+    const isAdmin = user.name.toLowerCase().startsWith("admin")
+
     const token = jwt.sign(
       {
-        userId: user._id,
-        name: user.name,
-        mobileNumber: user.mobileNumber,
+        userId: user?._id,
+        name: user?.name,
+        mobileNumber: user?.mobileNumber,
         email: user?.email,
-        city: user.city,
-        state: user.state,
+        city: user?.city,
+        state: user?.state,
         adminId:user?.adminId
       },
       process.env.SECRET_KEY,
