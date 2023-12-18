@@ -33,13 +33,15 @@ const getUser = async (req, res) => {
       return res.status(400).send({ message: "Incorrect password" });
     }
 
+    const isAdmin = user.name.toLowerCase().startsWith("admin")
+
     const token = jwt.sign(
       {
         userId: user._id,
         name: user.name,
         mobileNumber: user.mobileNumber,
         email: user?.email,
-        city: user.city,
+        city: isAdmin? isAdmin.split('@')[1] : user.city,
         state: user.state,
         adminId:user?.adminId
       },

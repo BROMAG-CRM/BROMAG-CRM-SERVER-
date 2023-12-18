@@ -499,6 +499,7 @@ async function generateRandomString(length) {
 const uploadCallRecord = async (req, res) => {
   console.log("111111111111111100");
 
+  const { id } = req.params;
   const { originalname, buffer } = req.file;
 
   const uniqueKey = (await generateRandomString(16)) + originalname;
@@ -523,6 +524,11 @@ const uploadCallRecord = async (req, res) => {
     // Log the URL of the uploaded file
     const fileUrl = `https://crm-s3bucket.s3.ap-south-1.amazonaws.com/${uniqueKey}`;
     console.log("File uploaded successfully:", fileUrl);
+
+    await Form.updateOne(
+      { _id: id },
+      { $set: { callRecord: fileUrl} }
+    )
 
     // Optionally, you can send the file URL as a response to the client
     res.json({ fileUrl });
