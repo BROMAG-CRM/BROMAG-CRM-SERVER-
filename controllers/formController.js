@@ -176,22 +176,44 @@ const getAssignedBooks = async (req, res) => {
     }
 
     const forms = await Form.find(query)
-      .select({
-        brandName: 1,
-        restaurantMobileNumber: 1,
-        firmName: 1,
-        contactPersonname: 1,
-        designation: 1,
-        contactPersonNumber: 1,
-        city: 1
-      });
+    .select({
+      brandName: 1,
+      restaurantMobileNumber: 1,
+      firmName: 1,
+      contactPersonname: 1,
+      designation: 1,
+      contactPersonNumber: 1,
+      city: 1,
+      leadStatus:1,
+      status:1,
+      adminId:1
+    });
 
-    const uniqueCitiesSet = new Set(forms.map(form => form.city));
-    const uniqueCities = Array.from(uniqueCitiesSet);
+  const uniqueCitiesSet = new Set(forms.map(form => form.city));
+  const uniqueCities = Array.from(uniqueCitiesSet);
 
-    console.log(uniqueCities);
+console.log(forms);
 
-    return res.status(200).send({ data: { forms, uniqueCities } });
+const newLeads = forms.filter(form => form.leadStatus === "new-lead");
+const opened = forms.filter(form => form.leadStatus === "connected" || form.leadStatus === "follow-up" || form.leadStatus === "not-connected");
+const followUp = forms.filter(form => form.leadStatus === "follow-up");
+const connected = forms.filter(form => form.leadStatus === "connected");
+const notConnected = forms.filter(form => form.leadStatus === "not-connected");
+
+const newLeadsCount = newLeads.length;
+const openedCount = opened.length;
+const followUpCount = followUp.length;
+const connectedCount = connected.length;
+const notConnectedCount = notConnected.length;
+
+console.log("New Leads Count:", newLeadsCount);
+console.log("Opened Count:", openedCount);
+console.log("Follow Up Count:", followUpCount);
+console.log("Connected Count:", connectedCount);
+console.log("Not Connected Count:", notConnectedCount);
+console.log("uniqueCities:",uniqueCities);
+
+  return res.status(200).send({ data: { newLeadsCount,openedCount,followUpCount,connectedCount,notConnectedCount,uniqueCities } });
   } catch (e) {
     console.error("Error fetching forms:", e);
     return res.status(500).send({ data: "Something went wrong while fetching the form" });
