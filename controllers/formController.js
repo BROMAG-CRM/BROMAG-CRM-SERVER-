@@ -574,7 +574,7 @@ const uploadCallRecord = async (req, res) => {
       })
     );
     // Log the URL of the uploaded file
-    const fileUrl = `https://crm-s3bucket.s3.ap-south-1.amazonaws.com/${uniqueKey}`;
+    const fileUrl = `https://crms3-bucket.s3.ap-south-1.amazonaws.com/${uniqueKey}`;
     console.log("File uploaded successfully:", fileUrl);
 
     await Form.updateOne(
