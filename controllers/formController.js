@@ -536,17 +536,17 @@ const uploadCallRecord = async (req, res) => {
   console.log(uniqueKey);
 
   const s3Client = new S3Client({
-    region: 'ap-south-1',
+    region: process.env.REGION,
     credentials: {
-      accessKeyId: 'AKIAY4YMHWOQNHNR6CWP',
-      secretAccessKey: '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',
+      accessKeyId: process.env.ACCESS_KEYID,
+      secretAccessKey: process.env.SECRETACCESS_KEY,
     },
   });
   
   try {
     const response = await s3Client.send(
       new PutObjectCommand({
-        Bucket: 'crm-s3bucket',
+        Bucket: process.env.BUCKET_NAME,
         Key: uniqueKey,
         Body: buffer,
       })
@@ -577,17 +577,17 @@ const uploadImage = async(req,res)=>{
     const uniqueKey = (await generateRandomString(16)) + originalname;
   
     const s3Client = new S3Client({
-      region: 'ap-south-1',
+      region: process.env.REGION,
       credentials: {
-        accessKeyId: 'AKIAQXYD576UOVKPG4Z5',      
-        secretAccessKey: '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',
+        accessKeyId: process.env.ACCESS_KEYID,      
+        secretAccessKey: process.env.SECRETACCESS_KEY,
       },
     });
     
     try {
       const response = await s3Client.send(
         new PutObjectCommand({
-          Bucket: 'crms3-bucket',
+          Bucket: process.env.BUCKET_NAME,
           Key: uniqueKey,
           Body: buffer,
         })

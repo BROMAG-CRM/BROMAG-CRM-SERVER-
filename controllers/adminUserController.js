@@ -42,7 +42,7 @@ const getUser = async (req, res) => {
         mobileNumber: user?.mobileNumber,
         email: user?.email,
         city: user?.city,
-        state: user?.state,
+        state: isAdmin?user.name.split('@')[1]:user.state,
         adminId: user?.adminId
       },
       process.env.SECRET_KEY,
