@@ -3,9 +3,8 @@ const router = express.Router();
 const multer = require('multer')
 
 const { createForm, getForm, updateForm, getUsers, 
-  updateUser, getAssignedIndia, deleteUser,
-getAssignedData, getNewLeadsDataIndia, updateLeadStatus, 
-updateLeadDescription, followUpDetails, 
+  updateUser, getAssignedIndia, deleteUser, getNewLeadsDataIndia, updateLeadStatus, 
+updateLeadDescription, followUpDetails,myLeadsBooks, 
 getFollowupLeadsDataIndia,addFeature,getConnectedLeadsDataIndia,
 getNotConnectedLeadsDataIndia,hotLeadsData,warmLeadsData,
 coldLeadsData,uploadCallRecord,uploadImage,getAssignedBooks,
@@ -37,7 +36,6 @@ router.post("/createform", createForm)
   .get("/getassignedindia",getAssignedIndia)
   .get("/getassignedbooks",getAssignedBooks)
   .delete("/deleteuser/:id",deleteUser)
-  .get("/getassigneddata/:city",getAssignedData)
   .get("/getnewleadsdataindia",getNewLeadsDataIndia)
   .post("/updateleadstatus",updateLeadStatus)
   .post("/updatedescription",updateLeadDescription)
@@ -51,6 +49,7 @@ router.post("/createform", createForm)
   .get("/coldleadsdata",coldLeadsData)
   .post("/uploadcallrecord/:id", upload.single('file'), uploadCallRecord)
   .post("/uploadimage",upload.single('file'),uploadImage)
+  .get("/myleadsbooks",myLeadsBooks)
   
 
 

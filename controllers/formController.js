@@ -114,7 +114,7 @@ const getAssignedIndia = async (req, res) => {
     if (isAdmin) {
       console.log(req.user);
       const adminId = req.user.userId
-      query = { adminId: adminId, status: "Hot",billingSoftware:"yes" }; 
+      query = { adminId: adminId, status: "Hot" }; 
     }
 
     const forms = await Form.find(query)
@@ -125,15 +125,37 @@ const getAssignedIndia = async (req, res) => {
         contactPersonname: 1,
         designation: 1,
         contactPersonNumber: 1,
-        city: 1
+        city: 1,
+        leadStatus:1,
+        status:1,
+        adminId:1
       });
 
     const uniqueCitiesSet = new Set(forms.map(form => form.city));
     const uniqueCities = Array.from(uniqueCitiesSet);
 
-    console.log(uniqueCities);
+console.log(forms);
 
-    return res.status(200).send({ data: { forms, uniqueCities } });
+const newLeads = forms.filter(form => form.leadStatus === "new-lead");
+const opened = forms.filter(form => form.leadStatus === "connected" || form.leadStatus === "follow-up" || form.leadStatus === "not-connected");
+const followUp = forms.filter(form => form.leadStatus === "follow-up");
+const connected = forms.filter(form => form.leadStatus === "connected");
+const notConnected = forms.filter(form => form.leadStatus === "not-connected");
+
+const newLeadsCount = newLeads.length;
+const openedCount = opened.length;
+const followUpCount = followUp.length;
+const connectedCount = connected.length;
+const notConnectedCount = notConnected.length;
+
+console.log("New Leads Count:", newLeadsCount);
+console.log("Opened Count:", openedCount);
+console.log("Follow Up Count:", followUpCount);
+console.log("Connected Count:", connectedCount);
+console.log("Not Connected Count:", notConnectedCount);
+console.log("uniqueCities:",uniqueCities);
+
+    return res.status(200).send({ data: { newLeadsCount,openedCount,followUpCount,connectedCount,notConnectedCount,uniqueCities } });
   } catch (e) {
     console.error("Error fetching forms:", e);
     return res.status(500).send({ data: "Something went wrong while fetching the form" });
@@ -150,7 +172,7 @@ const getAssignedBooks = async (req, res) => {
     if (isAdmin) {
       console.log(req.user);
       const adminId = req.user.userId
-      query = { adminId: adminId, status: "Hot",billingSoftware:"no"}; 
+      query = { adminId: adminId, billingSoftware:"no"}; 
     }
 
     const forms = await Form.find(query)
@@ -178,37 +200,6 @@ const getAssignedBooks = async (req, res) => {
 
 
 
-const getAssignedData = async (req, res) => {
-  try {
-    const { city } = req.params;
-    const isAdmin = req.user.name.toLowerCase().startsWith("admin");
-
-    let query = {};
-
-    if (isAdmin) {
-      query = { city: city, status: "Hot" }; 
-    }
-
-    const forms = await Form.find(query)
-      .select({
-        brandName: 1,
-        restaurantMobileNumber: 1,
-        firmName: 1,
-        contactPersonname: 1,
-        designation: 1,
-        contactPersonNumber: 1,
-        city: 1
-      });
-      console.log(forms);
-
-    return res.status(200).send({ data:  forms });
-  } catch (e) {
-    console.error("Error fetching forms:", e);
-    return res.status(500).send({ data: "Something went wrong while fetching the form" });
-  }
-};
-
-
 const getNewLeadsDataIndia = async (req,res) => {
   try {
     const isAdmin = req.user.name.toLowerCase().startsWith("admin");
@@ -217,7 +208,7 @@ const getNewLeadsDataIndia = async (req,res) => {
 
     if (isAdmin) {
       const adminId = req.user.userId
-      query = { adminId: adminId, status: "Hot", leadStatus:"new-lead",billingSoftware:"yes" }; 
+      query = { adminId: adminId, status: "Hot", leadStatus:"new-lead"}; 
     }
 
     const forms = await Form.find(query)
@@ -298,7 +289,7 @@ const getFollowupLeadsDataIndia = async(req,res)=> {
 
     if (isAdmin) {
       const adminId = req.user.userId
-      query = { adminId: adminId, status: "Hot" ,leadStatus:"follow-up",billingSoftware:"yes"}; 
+      query = { adminId: adminId, status: "Hot" ,leadStatus:"follow-up"}; 
     }
 
     const forms = await Form.find(query)
@@ -352,7 +343,6 @@ const addFeature = async (req, res) => {
 const getConnectedLeadsDataIndia = async (req,res)=> {
 
 
-  console.log("1111111connectee");
 
   try {
     const isAdmin = req.user.name.toLowerCase().startsWith("admin");
@@ -361,7 +351,7 @@ const getConnectedLeadsDataIndia = async (req,res)=> {
 
     if (isAdmin) {
       const adminId = req.user.userId
-      query = { adminId: adminId, status: "Hot", leadStatus:"connected", billingSoftware:"yes" }; 
+      query = { adminId: adminId, status: "Hot", leadStatus:"connected"}; 
     }
 
     const forms = await Form.find(query)
@@ -398,7 +388,7 @@ const getNotConnectedLeadsDataIndia = async (req,res)=> {
 
     if (isAdmin) {
       const adminId = req.user.userId
-      query = { adminId: adminId, status: "Hot", leadStatus:"not-connected" ,billingSoftware:"yes" }; 
+      query = { adminId: adminId, status: "Hot", leadStatus:"not-connected"}; 
     }
 
     const forms = await Form.find(query)
@@ -538,7 +528,6 @@ async function generateRandomString(length) {
 
 
 const uploadCallRecord = async (req, res) => {
-  console.log("111111111111111100");
 
   const { id } = req.params;
   const { originalname, buffer } = req.file;
@@ -613,17 +602,46 @@ const uploadImage = async(req,res)=>{
     }
   };
 
+  const myLeadsBooks = async(req,res)=>{
+    try {
+      const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+  
+      let query = {};
+  
+      if (isAdmin) {
+        const adminId = req.user.userId
+        query = { adminId: adminId , billingSoftware:"no"}; 
+      }
+      const forms = await Form.find(query)
+        .select({
+          brandName: 1,
+          restaurantMobileNumber: 1,
+          firmName: 1,
+          contactPersonname: 1,
+          designation: 1,
+          contactPersonNumber: 1,
+          city: 1,
+        });
+        console.log(forms);
+  
+      return res.status(200).send({ data:  forms });
+    } catch (e) {
+      console.error("Error fetching forms:", e);
+      return res.status(500).send({ data: "Something went wrong while fetching the form" });
+    }
+  }
+
 
 module.exports={
   createForm,getForm,updateForm,getUsers,
-  updateUser,getAssignedIndia,deleteUser,
-  getAssignedData,getNewLeadsDataIndia,
+  updateUser,getAssignedIndia,deleteUser
+  ,getNewLeadsDataIndia,
   updateLeadStatus,updateLeadDescription,
   followUpDetails,getFollowupLeadsDataIndia,
   addFeature,getConnectedLeadsDataIndia,
   getNotConnectedLeadsDataIndia,hotLeadsData,
   warmLeadsData,coldLeadsData,uploadCallRecord,
-  uploadImage,getAssignedBooks
+  uploadImage,getAssignedBooks,myLeadsBooks
 }
 
 
