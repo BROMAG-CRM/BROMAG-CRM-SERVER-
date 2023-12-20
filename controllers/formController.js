@@ -325,7 +325,8 @@ const getFollowupLeadsDataIndia = async(req,res)=> {
         city: 1,
         leadDescription: 1,
         followupTime: 1,
-        followupDate: 1
+        followupDate: 1,
+        callRecord: 1
       });
       console.log(forms);
 
@@ -373,7 +374,7 @@ const getConnectedLeadsDataIndia = async (req,res)=> {
 
     if (isAdmin) {
       const adminId = req.user.userId
-      query = { adminId: adminId, status: "Hot", leadStatus:"connected"}; 
+      query = { adminId: adminId, status: "Hot", leadStatus:"connected",businessStatus:"telemarketing"}; 
     }
 
     const forms = await Form.find(query)
@@ -386,7 +387,10 @@ const getConnectedLeadsDataIndia = async (req,res)=> {
         contactPersonNumber: 1,
         city: 1,
         leadDescription: 1,
-        callRecord:1
+        callRecord:1,
+        features:1,
+        status: 1,
+        leadStatus: 1,        
       });
       console.log(forms);
 
@@ -437,7 +441,7 @@ const getNotConnectedLeadsDataIndia = async (req,res)=> {
 
 
 
-const hotLeadsData = async (req,res)=> {
+const progressLeadsData = async (req,res)=> {
   try {
     const isAdmin = req.user.name.toLowerCase().startsWith("admin");
 
@@ -445,7 +449,7 @@ const hotLeadsData = async (req,res)=> {
 
     if (isAdmin) {
       const adminId = req.user.userId
-      query = { adminId: adminId, status: "Hot" }; 
+      query = { adminId: adminId, status: "Hot",businessStatus:"telesales" }; 
     }
 
     const forms = await Form.find(query)
@@ -458,6 +462,8 @@ const hotLeadsData = async (req,res)=> {
         contactPersonNumber: 1,
         city: 1,
         leadDescription: 1,
+        callRecord: 1,
+        features: 1
       });
       console.log(forms);
 
@@ -479,40 +485,6 @@ const warmLeadsData = async (req,res)=> {
     if (isAdmin) {
       const adminId = req.user.userId
       query = { adminId: adminId, status: "Warm" }; 
-    }
-
-    const forms = await Form.find(query)
-      .select({
-        brandName: 1,
-        restaurantMobileNumber: 1,
-        firmName: 1,
-        contactPersonname: 1,
-        designation: 1,
-        contactPersonNumber: 1,
-        city: 1,
-        leadDescription: 1,
-      });
-      console.log(forms);
-
-    return res.status(200).send({ data:  forms });
-  } catch (e) {
-    console.error("Error fetching forms:", e);
-    return res.status(500).send({ data: "Something went wrong while fetching the form" });
-  }
-}
-
-
-
-
-const coldLeadsData = async (req,res)=> {
-  try {
-    const isAdmin = req.user.name.toLowerCase().startsWith("admin");
-
-    let query = {};
-
-    if (isAdmin) {
-      const adminId = req.user.userId
-      query = { adminId: adminId, status: "Cold" }; 
     }
 
     const forms = await Form.find(query)
@@ -579,7 +551,7 @@ const uploadCallRecord = async (req, res) => {
 
     await Form.updateOne(
       { _id: id },
-      { $set: { callRecord: fileUrl} }
+      { $push: { callRecord: fileUrl} }
     )
 
     // Optionally, you can send the file URL as a response to the client
@@ -654,6 +626,23 @@ const uploadImage = async(req,res)=>{
   }
 
 
+  const businessStatus = async(req,res)=>{
+try {
+
+  console.log(req.body);
+
+  const {userId,newBusinessStatus} = req.body
+  const data = await Form.updateOne({_id:userId},{$set:{businessStatus:newBusinessStatus}})
+  res.status(200).json({});
+
+} catch (e) {
+  console.error("Error updating forms:", e);
+  return res.status(500).send({ data: "Something went wrong while updating the form" });
+}
+
+  }
+
+
 module.exports={
   createForm,getForm,updateForm,getUsers,
   updateUser,getAssignedIndia,deleteUser
@@ -661,9 +650,10 @@ module.exports={
   updateLeadStatus,updateLeadDescription,
   followUpDetails,getFollowupLeadsDataIndia,
   addFeature,getConnectedLeadsDataIndia,
-  getNotConnectedLeadsDataIndia,hotLeadsData,
-  warmLeadsData,coldLeadsData,uploadCallRecord,
-  uploadImage,getAssignedBooks,myLeadsBooks
+  getNotConnectedLeadsDataIndia,progressLeadsData,
+  warmLeadsData,uploadCallRecord,
+  uploadImage,getAssignedBooks,myLeadsBooks,
+  businessStatus
 }
 
 

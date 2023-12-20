@@ -152,7 +152,11 @@ const addDetailsEmployeeSchema = mongoose.Schema({
     featureDescription: { type: String },
 }],
 callRecord:{
-  type:String
+  type:Array
+},
+businessStatus:{
+  type:String,
+  default:"telemarketing"
 }
 
 });
