@@ -157,6 +157,9 @@ callRecord:{
 businessStatus:{
   type:String,
   default:"telemarketing"
+},
+videoRecord:{
+  type:Array
 }
 
 });

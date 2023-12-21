@@ -6,9 +6,9 @@ const { createForm, getForm, updateForm, getUsers,
   updateUser, getAssignedIndia, deleteUser, getNewLeadsDataIndia, updateLeadStatus, 
 updateLeadDescription, followUpDetails,myLeadsBooks, 
 getFollowupLeadsDataIndia,addFeature,getConnectedLeadsDataIndia,
-getNotConnectedLeadsDataIndia,progressLeadsData,warmLeadsData
+getNotConnectedLeadsDataIndia,progressLeadsData
 ,uploadCallRecord,uploadImage,getAssignedBooks,
-businessStatus} = require("../controllers/formController");
+businessStatus,uploadVideoRecord} = require("../controllers/formController");
 
 
 
@@ -45,11 +45,11 @@ router.post("/createform", createForm)
   .get("/connectedleadsdataindia",getConnectedLeadsDataIndia)
   .get("/notconnectedleadsdataindia",getNotConnectedLeadsDataIndia)
   .get("/progressleadsdata",progressLeadsData)
-  .get("/warmleadsdata",warmLeadsData)
-  .post("/uploadcallrecord/:id", upload.single('file'), uploadCallRecord)
+  .post("/uploadcallrecord/:id",upload.single('file'), uploadCallRecord)
   .post("/uploadimage",upload.single('file'),uploadImage)
   .get("/myleadsbooks",myLeadsBooks)
   .post("/businessstatus",businessStatus)
+  .post("/uploadvideorecord/:id",upload.single('file'),uploadVideoRecord)
 
   
 

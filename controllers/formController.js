@@ -463,40 +463,8 @@ const progressLeadsData = async (req,res)=> {
         city: 1,
         leadDescription: 1,
         callRecord: 1,
-        features: 1
-      });
-      console.log(forms);
-
-    return res.status(200).send({ data:  forms });
-  } catch (e) {
-    console.error("Error fetching forms:", e);
-    return res.status(500).send({ data: "Something went wrong while fetching the form" });
-  }
-}
-
-
-
-const warmLeadsData = async (req,res)=> {
-  try {
-    const isAdmin = req.user.name.toLowerCase().startsWith("admin");
-
-    let query = {};
-
-    if (isAdmin) {
-      const adminId = req.user.userId
-      query = { adminId: adminId, status: "Warm" }; 
-    }
-
-    const forms = await Form.find(query)
-      .select({
-        brandName: 1,
-        restaurantMobileNumber: 1,
-        firmName: 1,
-        contactPersonname: 1,
-        designation: 1,
-        contactPersonNumber: 1,
-        city: 1,
-        leadDescription: 1,
+        features: 1,
+        videoRecord: 1
       });
       console.log(forms);
 
@@ -643,6 +611,51 @@ try {
   }
 
 
+  const uploadVideoRecord = async(req,res)=> {
+
+
+    const { id } = req.params;
+    const { originalname, buffer } = req.file;
+
+    const uniqueKey = (await generateRandomString(16)) + originalname;
+    console.log(uniqueKey);
+  
+    const s3Client = new S3Client({
+      region: process.env.REGION,
+      credentials: {
+        accessKeyId: process.env.ACCESS_KEYID,
+        secretAccessKey: process.env.SECRETACCESS_KEY,
+      },
+    });
+    
+    try {
+      const response = await s3Client.send(
+        new PutObjectCommand({
+          Bucket: process.env.BUCKET_NAME,
+          Key: uniqueKey,
+          Body: buffer,
+        })
+      );
+      // Log the URL of the uploaded file
+      const fileUrl = `https://crms3-bucket.s3.ap-south-1.amazonaws.com/${uniqueKey}`;
+      console.log("File uploaded successfully:", fileUrl);
+  
+      await Form.updateOne(
+        { _id: id },
+        { $push: { videoRecord: fileUrl} }
+      )
+  
+      // Optionally, you can send the file URL as a response to the client
+      res.json({ fileUrl });
+  
+    } catch (error) {
+      console.error("Error uploading file to S3:", error);
+      res.status(500).json({ error: 'Failed to upload file' });
+    }
+
+  }
+
+
 module.exports={
   createForm,getForm,updateForm,getUsers,
   updateUser,getAssignedIndia,deleteUser
@@ -650,10 +663,10 @@ module.exports={
   updateLeadStatus,updateLeadDescription,
   followUpDetails,getFollowupLeadsDataIndia,
   addFeature,getConnectedLeadsDataIndia,
-  getNotConnectedLeadsDataIndia,progressLeadsData,
-  warmLeadsData,uploadCallRecord,
+  getNotConnectedLeadsDataIndia,progressLeadsData
+  ,uploadCallRecord,
   uploadImage,getAssignedBooks,myLeadsBooks,
-  businessStatus
+  businessStatus,uploadVideoRecord
 }
 
 
