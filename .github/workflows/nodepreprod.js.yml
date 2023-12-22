@@ -26,5 +26,5 @@ jobs:
         cache: 'npm'
     - run: npm ci
     - run: pwd
-    - run: cp /home/ubuntu/preprodenv/server/.env /home/ubuntu/preprod-server-runner/_work/BROMAG-CRM/BROMAG-CRM-SERVER
+    - run: cp /home/ubuntu/preprodenv/server/.env /home/ubuntu/preprod-server-runner/_work/BROMAG-CRM-SERVER-/BROMAG-CRM-SERVER-
     - run: pm2 start index.js --name preprod
