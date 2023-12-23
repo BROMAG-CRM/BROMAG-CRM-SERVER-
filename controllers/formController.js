@@ -232,7 +232,7 @@ const getNewLeadsDataIndia = async (req,res) => {
 
     if (isAdmin) {
       const adminId = req.user.userId
-      query = { adminId: adminId, status: "Hot", leadStatus:"new-lead"}; 
+      query = { adminId: adminId, status: "Hot", leadStatus:"new-lead",businessStatus:"telemarketing"}; 
     }
 
     const forms = await Form.find(query)
@@ -244,7 +244,9 @@ const getNewLeadsDataIndia = async (req,res) => {
         designation: 1,
         contactPersonNumber: 1,
         city: 1,
-        newLeadFeatures: 1
+        newLeadFeatures: 1,
+        businessStatus:1
+
       });
       console.log(forms);
 
@@ -302,7 +304,7 @@ const getFollowupLeadsDataIndia = async(req,res)=> {
 
     if (isAdmin) {
       const adminId = req.user.userId
-      query = { adminId: adminId, status: "Hot" ,leadStatus:"follow-up"}; 
+      query = { adminId: adminId, status: "Hot" ,leadStatus:"follow-up",businessStatus:"telemarketing"}; 
     }
 
     const forms = await Form.find(query)
@@ -317,7 +319,8 @@ const getFollowupLeadsDataIndia = async(req,res)=> {
         leadDescription: 1,
         followupTime: 1,
         followupDate: 1,
-        callRecord: 1
+        callRecord: 1,
+        features: 1
       });
       console.log(forms);
 
@@ -405,7 +408,7 @@ const getNotConnectedLeadsDataIndia = async (req,res)=> {
 
     if (isAdmin) {
       const adminId = req.user.userId
-      query = { adminId: adminId, status: "Hot", leadStatus:"not-connected"}; 
+      query = { adminId: adminId, status: "Hot", leadStatus:"not-connected" ,businessStatus:"telemarketing"}; 
     }
 
     const forms = await Form.find(query)
@@ -491,6 +494,9 @@ const uploadCallRecord = async (req, res) => {
   const uniqueKey = (await generateRandomString(16)) + originalname;
   console.log(uniqueKey);
 
+  const folderName = 'callRecords'; 
+  const key = `${folderName}/${uniqueKey}`;
+
   const s3Client = new S3Client({
     region: process.env.REGION,
     credentials: {
@@ -503,12 +509,12 @@ const uploadCallRecord = async (req, res) => {
     const response = await s3Client.send(
       new PutObjectCommand({
         Bucket: process.env.BUCKET_NAME,
-        Key: uniqueKey,
+        Key: key,
         Body: buffer,
       })
     );
     // Log the URL of the uploaded file
-    const fileUrl = `https://crms3-bucket.s3.ap-south-1.amazonaws.com/${uniqueKey}`;
+    const fileUrl = `https://crms3-bucket.s3.ap-south-1.amazonaws.com/${key}`;
     console.log("File uploaded successfully:", fileUrl);
 
     await Form.updateOne(
@@ -594,8 +600,19 @@ try {
   console.log(req.body);
 
   const {userId,newBusinessStatus} = req.body
-  const data = await Form.updateOne({_id:userId},{$set:{businessStatus:newBusinessStatus}})
+  const data = await Form.updateMany(
+    { _id: userId },
+    {
+      $set: {
+        businessStatus: newBusinessStatus,
+        leadStatus: "new-lead",
+      },
+    }
+  )
   res.status(200).json({});
+
+;
+  
 
 } catch (e) {
   console.error("Error updating forms:", e);
@@ -652,6 +669,7 @@ try {
 
   const addVideoFeature = async (req, res) => {
     try {
+      console.log("loooooooo");
       const { featureName, featureDescription, id } = req.body;
       console.log(req.body);
   
@@ -663,9 +681,7 @@ try {
           },
         }
       );
-  
-     console.log(result);
-    
+      
       return res.status(200).json({ data: result });
     } catch (error) {
       console.error("Error updating feature:", error);
@@ -845,6 +861,456 @@ try {
   }
 
 
+  const booksConnectedInMarkrting = async(req,res)=> {
+
+    try {
+      const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+  
+      let query = {};
+  
+      if (isAdmin) {
+        const adminId = req.user.userId
+        query = { adminId: adminId, status: "Hot", booksLeadStatus:"connected",booksBusinessStatus:"telemarketing" ,billingSoftware:"no"}; 
+      }
+  
+      const forms = await Form.find(query)
+        .select({
+          brandName: 1,
+          restaurantMobileNumber: 1,
+          firmName: 1,
+          contactPersonname: 1,
+          designation: 1,
+          contactPersonNumber: 1,
+          city: 1,
+          leadDescription: 1,
+          callRecord:1,
+          features:1,
+          status: 1,
+          leadStatus: 1,        
+        });
+        console.log(forms);
+  
+      return res.status(200).send({ data:  forms });
+    } catch (e) {
+      console.error("Error fetching forms:", e);
+      return res.status(500).send({ data: "Something went wrong while fetching the form" });
+    }
+
+  }
+
+  const booksFollowUpInMarkrting = async(req,res)=> {
+
+    try {
+      const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+  
+      let query = {};
+  
+      if (isAdmin) {
+        const adminId = req.user.userId
+        query = { adminId: adminId, status: "Hot" ,booksLeadStatus:"follow-up",booksBusinessStatus:"telemarketing" ,billingSoftware:"no"}; 
+      }
+  
+      const forms = await Form.find(query)
+        .select({
+          brandName: 1,
+          restaurantMobileNumber: 1,
+          firmName: 1,
+          contactPersonname: 1,
+          designation: 1,
+          contactPersonNumber: 1,
+          city: 1,
+          leadDescription: 1,
+          followupTime: 1,
+          followupDate: 1,
+          callRecord: 1
+        });
+        console.log(forms);
+  
+      return res.status(200).send({ data:  forms });
+    } catch (e) {
+      console.error("Error fetching forms:", e);
+      return res.status(500).send({ data: "Something went wrong while fetching the form" });
+    }
+
+  }
+
+
+  const booksNewLeadInMarkrting = async(req,res)=>{
+    try {
+      const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+  
+      let query = {};
+  
+      if (isAdmin) {
+        const adminId = req.user.userId
+        query = { adminId: adminId, status: "Hot", booksLeadStatus:"new-lead",booksBusinessStatus:"telemarketing" ,billingSoftware:"no"}; 
+      }
+  
+      const forms = await Form.find(query)
+        .select({
+          brandName: 1,
+          restaurantMobileNumber: 1,
+          firmName: 1,
+          contactPersonname: 1,
+          designation: 1,
+          contactPersonNumber: 1,
+          city: 1,
+          newLeadFeatures: 1,
+          businessStatus:1
+        });
+        console.log(forms);
+
+      return res.status(200).send({ data:  forms });
+    } catch (e) {
+      console.error("Error fetching forms:", e);
+      return res.status(500).send({ data: "Something went wrong while fetching the form" });
+    }
+  }
+
+
+  const booksNotConnectedInMarkrting = async(req,res)=>{
+
+    try {
+      const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+  
+      let query = {};
+  
+      if (isAdmin) {
+        const adminId = req.user.userId
+        query = { adminId: adminId, status: "Hot", booksLeadStatus:"not-connected" ,booksBusinessStatus:"telemarketing",billingSoftware:"no"}; 
+      }
+  
+      const forms = await Form.find(query)
+        .select({
+          brandName: 1,
+          restaurantMobileNumber: 1,
+          firmName: 1,
+          contactPersonname: 1,
+          designation: 1,
+          contactPersonNumber: 1,
+          city: 1,
+          leadDescription: 1,
+        });
+        console.log(forms);
+  
+      return res.status(200).send({ data:  forms });
+    } catch (e) {
+      console.error("Error fetching forms:", e);
+      return res.status(500).send({ data: "Something went wrong while fetching the form" });
+    }
+  
+
+  }
+
+  const indiaConnectedInSales = async(req,res)=>{
+    try {
+      const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+  
+      let query = {};
+  
+      if (isAdmin) {
+        const adminId = req.user.userId
+        query = { adminId: adminId, status: "Hot", leadStatus:"connected",businessStatus:"telesales"}; 
+      }
+  
+      const forms = await Form.find(query)
+        .select({
+          brandName: 1,
+          restaurantMobileNumber: 1,
+          firmName: 1,
+          contactPersonname: 1,
+          designation: 1,
+          contactPersonNumber: 1,
+          city: 1,
+          leadDescription: 1,
+          videoRecord: 1,
+          status: 1,
+          leadStatus: 1,
+          videoFeatures:1        
+        });
+        console.log(forms);
+  
+      return res.status(200).send({ data:  forms });
+    } catch (e) {
+      console.error("Error fetching forms:", e);
+      return res.status(500).send({ data: "Something went wrong while fetching the form" });
+    }
+
+  }
+
+
+  const indiaFollowUpInSales = async(req,res)=>{
+
+    try {
+      const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+  
+      let query = {};
+  
+      if (isAdmin) {
+        const adminId = req.user.userId
+        query = { adminId: adminId, status: "Hot" ,leadStatus:"follow-up",businessStatus:"telesales"}; 
+      }
+  
+      const forms = await Form.find(query)
+        .select({
+          brandName: 1,
+          restaurantMobileNumber: 1,
+          firmName: 1,
+          contactPersonname: 1,
+          designation: 1,
+          contactPersonNumber: 1,
+          city: 1,
+          leadDescription: 1,
+          followupTime: 1,
+          followupDate: 1,
+          callRecord: 1
+        });
+        console.log(forms);
+  
+      return res.status(200).send({ data:  forms });
+    } catch (e) {
+      console.error("Error fetching forms:", e);
+      return res.status(500).send({ data: "Something went wrong while fetching the form" });
+    }
+
+  }
+
+
+  const indiaNewLeadsInSales =async(req,res)=>{
+
+    try {
+      const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+  
+      let query = {};
+  
+      if (isAdmin) {
+        const adminId = req.user.userId
+        query = { adminId: adminId, status: "Hot", leadStatus:"new-lead",businessStatus:"telesales"}; 
+      }
+  
+      const forms = await Form.find(query)
+        .select({
+          brandName: 1,
+          restaurantMobileNumber: 1,
+          firmName: 1,
+          contactPersonname: 1,
+          designation: 1,
+          contactPersonNumber: 1,
+          city: 1,
+          newLeadFeatures: 1
+        });
+        console.log(forms);
+  
+      return res.status(200).send({ data:  forms });
+    } catch (e) {
+      console.error("Error fetching forms:", e);
+      return res.status(500).send({ data: "Something went wrong while fetching the form" });
+    }
+
+  }
+
+
+  const indiaNotConnectedInSales = async(req,res)=> {
+
+    try {
+      const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+  
+      let query = {};
+  
+      if (isAdmin) {
+        const adminId = req.user.userId
+        query = { adminId: adminId, status: "Hot", leadStatus:"not-connected" ,businessStatus:"telesales"}; 
+      }
+  
+      const forms = await Form.find(query)
+        .select({
+          brandName: 1,
+          restaurantMobileNumber: 1,
+          firmName: 1,
+          contactPersonname: 1,
+          designation: 1,
+          contactPersonNumber: 1,
+          city: 1,
+          leadDescription: 1,
+        });
+        console.log(forms);
+  
+      return res.status(200).send({ data:  forms });
+    } catch (e) {
+      console.error("Error fetching forms:", e);
+      return res.status(500).send({ data: "Something went wrong while fetching the form" });
+    }
+  
+  }
+
+
+  const booksNewLeadInSales = async(req,res)=>{
+
+    try {
+      const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+  
+      let query = {};
+  
+      if (isAdmin) {
+        const adminId = req.user.userId
+        query = { adminId: adminId, status: "Hot", booksLeadStatus:"new-lead",booksBusinessStatus:"telesales" ,billingSoftware:"no"}; 
+      }
+  
+      const forms = await Form.find(query)
+        .select({
+          brandName: 1,
+          restaurantMobileNumber: 1,
+          firmName: 1,
+          contactPersonname: 1,
+          designation: 1,
+          contactPersonNumber: 1,
+          city: 1,
+          newLeadFeatures: 1,
+          businessStatus:1
+        });
+        console.log(forms);
+
+      return res.status(200).send({ data:  forms });
+    } catch (e) {
+      console.error("Error fetching forms:", e);
+      return res.status(500).send({ data: "Something went wrong while fetching the form" });
+    }
+
+  }
+
+
+  const booksFollowUpInSales = async(req,res)=>{
+    try {
+      const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+  
+      let query = {};
+  
+      if (isAdmin) {
+        const adminId = req.user.userId
+        query = { adminId: adminId, status: "Hot" ,booksLeadStatus:"follow-up",booksBusinessStatus:"telesales" ,billingSoftware:"no"}; 
+      }
+  
+      const forms = await Form.find(query)
+        .select({
+          brandName: 1,
+          restaurantMobileNumber: 1,
+          firmName: 1,
+          contactPersonname: 1,
+          designation: 1,
+          contactPersonNumber: 1,
+          city: 1,
+          leadDescription: 1,
+          followupTime: 1,
+          followupDate: 1,
+          callRecord: 1
+        });
+        console.log(forms);
+  
+      return res.status(200).send({ data:  forms });
+    } catch (e) {
+      console.error("Error fetching forms:", e);
+      return res.status(500).send({ data: "Something went wrong while fetching the form" });
+    }
+  }
+
+
+
+const booksConnectedInSales = async(req,res)=>{
+
+
+  try {
+    const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+
+    let query = {};
+
+    if (isAdmin) {
+      const adminId = req.user.userId
+      query = { adminId: adminId, status: "Hot", booksLeadStatus:"connected",booksBusinessStatus:"telesales" ,billingSoftware:"no"}; 
+    }
+
+    const forms = await Form.find(query)
+      .select({
+        brandName: 1,
+        restaurantMobileNumber: 1,
+        firmName: 1,
+        contactPersonname: 1,
+        designation: 1,
+        contactPersonNumber: 1,
+        city: 1,
+        leadDescription: 1,
+        callRecord:1,
+        features:1,
+        status: 1,
+        leadStatus: 1,        
+      });
+      console.log(forms);
+
+    return res.status(200).send({ data:  forms });
+  } catch (e) {
+    console.error("Error fetching forms:", e);
+    return res.status(500).send({ data: "Something went wrong while fetching the form" });
+  }
+
+}
+
+
+const booksNotConnectedInSales = async(req,res)=>{
+
+
+  try {
+    const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+
+    let query = {};
+
+    if (isAdmin) {
+      const adminId = req.user.userId
+      query = { adminId: adminId, status: "Hot", booksLeadStatus:"not-connected" ,booksBusinessStatus:"telesales",billingSoftware:"no"}; 
+    }
+
+    const forms = await Form.find(query)
+      .select({
+        brandName: 1,
+        restaurantMobileNumber: 1,
+        firmName: 1,
+        contactPersonname: 1,
+        designation: 1,
+        contactPersonNumber: 1,
+        city: 1,
+        leadDescription: 1,
+      });
+      console.log(forms);
+
+    return res.status(200).send({ data:  forms });
+  } catch (e) {
+    console.error("Error fetching forms:", e);
+    return res.status(500).send({ data: "Something went wrong while fetching the form" });
+  }
+
+
+}
+
+
+
+const updateBooksStatus = async(req,res)=>{
+
+  console.log("result");
+
+  try {
+    const {value,id} = req.body
+    const result = await Form.updateOne(
+      { _id: id },
+      { $set: { booksLeadStatus: value } }
+    );
+    console.log(result);
+    return res.status(200).json({ data: result });
+  } catch (error) {
+    console.error("Error updating description:", error);
+    return res.status(500).send("Something went wrong while updating description");
+  }
+
+}
+
+
 module.exports={
   createForm,getForm,updateForm,getUsers,
   updateUser,getAssignedIndia,deleteUser
@@ -857,7 +1323,13 @@ module.exports={
   uploadImage,getAssignedBooks,myLeadsBooks,
   businessStatus,uploadVideoRecord,addVideoFeature,
   addNewLeadFeature,salesBooks,SalesCampaignsIndia,
-  SalesCampaignsBooks
+  SalesCampaignsBooks,booksConnectedInMarkrting,
+  booksFollowUpInMarkrting,booksNewLeadInMarkrting,
+  booksNotConnectedInMarkrting,indiaConnectedInSales,
+  indiaFollowUpInSales,indiaNewLeadsInSales,
+  indiaNotConnectedInSales,booksNewLeadInSales,
+  booksFollowUpInSales,booksConnectedInSales,
+  booksNotConnectedInSales,updateBooksStatus
 }
 
 

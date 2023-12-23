@@ -10,7 +10,15 @@ getNotConnectedLeadsDataIndia,progressLeadsData
 ,uploadCallRecord,uploadImage,getAssignedBooks,
 businessStatus,uploadVideoRecord,addVideoFeature,
 addNewLeadFeature,salesBooks,SalesCampaignsIndia,
-SalesCampaignsBooks} = require("../controllers/formController");
+SalesCampaignsBooks,booksConnectedInMarkrting,
+booksFollowUpInMarkrting,booksNewLeadInMarkrting,
+booksNotConnectedInMarkrting,indiaConnectedInSales,
+indiaFollowUpInSales,indiaNewLeadsInSales,
+indiaNotConnectedInSales,booksNewLeadInSales,
+booksFollowUpInSales,booksConnectedInSales,
+booksNotConnectedInSales,updateBooksStatus
+
+} = require("../controllers/formController");
 
 
 
@@ -56,6 +64,20 @@ router.post("/createform", createForm)
   .get("/salessbooks",salesBooks)
   .get("/salescampaignsindia",SalesCampaignsIndia)
   .get("/salescampaignsbooks",SalesCampaignsBooks)
+  .get("/booksconnectedinmarketing",booksConnectedInMarkrting)
+  .get("/booksfollowupinmarketing",booksFollowUpInMarkrting)
+  .get("/booksnewleadinmarketing",booksNewLeadInMarkrting)
+  .get("/booksnotconnectedinmarketing",booksNotConnectedInMarkrting)
+  .get("/indiaconnectedinsales",indiaConnectedInSales)
+  .get("/indiafollowupinsales",indiaFollowUpInSales)
+  .get("/indianewleadsinsales",indiaNewLeadsInSales)
+  .get("/indianotconnectedinsales",indiaNotConnectedInSales)
+  .get("/booksnewleadinsales",booksNewLeadInSales)
+  .get("/booksfollowupinsales",booksFollowUpInSales)
+  .get("/booksconnectedinsales",booksConnectedInSales)
+  .get("/booksnotconnectedinsales",booksNotConnectedInSales)
+  .post("/updatebooksstatus",updateBooksStatus)
+
   
 
 
