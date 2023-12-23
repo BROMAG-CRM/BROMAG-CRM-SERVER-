@@ -630,6 +630,9 @@ try {
 
     const uniqueKey = (await generateRandomString(16)) + originalname;
     console.log(uniqueKey);
+
+    const folderName = 'videoRecords'; 
+    const key = `${folderName}/${uniqueKey}`;
   
     const s3Client = new S3Client({
       region: process.env.REGION,
@@ -643,12 +646,12 @@ try {
       const response = await s3Client.send(
         new PutObjectCommand({
           Bucket: process.env.BUCKET_NAME,
-          Key: uniqueKey,
+          Key: key,
           Body: buffer,
         })
       );
       // Log the URL of the uploaded file
-      const fileUrl = `https://crms3-bucket.s3.ap-south-1.amazonaws.com/${uniqueKey}`;
+      const fileUrl = `https://crms3-bucket.s3.ap-south-1.amazonaws.com/${key}`;
       console.log("File uploaded successfully:", fileUrl);
   
       await Form.updateOne(
