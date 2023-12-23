@@ -3,12 +3,14 @@ const router = express.Router();
 const multer = require('multer')
 
 const { createForm, getForm, updateForm, getUsers, 
-  updateUser, getAssignedIndia, deleteUser, getNewLeadsDataIndia, updateLeadStatus, 
-updateLeadDescription, followUpDetails,myLeadsBooks, 
+  updateUser, getAssignedIndia, deleteUser, getNewLeadsDataIndia, updateLeadStatus
+  , followUpDetails,myLeadsBooks, 
 getFollowupLeadsDataIndia,addFeature,getConnectedLeadsDataIndia,
 getNotConnectedLeadsDataIndia,progressLeadsData
 ,uploadCallRecord,uploadImage,getAssignedBooks,
-businessStatus,uploadVideoRecord} = require("../controllers/formController");
+businessStatus,uploadVideoRecord,addVideoFeature,
+addNewLeadFeature,salesBooks,SalesCampaignsIndia,
+SalesCampaignsBooks} = require("../controllers/formController");
 
 
 
@@ -29,7 +31,7 @@ router.use(Auth);
 console.log("routeee");
 
 router.post("/createform", createForm)
-  .get("/getform", getForm)
+  .get("/getform/:category", getForm)
   .get("/getusers",getUsers)
   .put("/updateform/:id", updateForm)
   .post("/updateduser/:id",updateUser)
@@ -38,7 +40,6 @@ router.post("/createform", createForm)
   .delete("/deleteuser/:id",deleteUser)
   .get("/getnewleadsdataindia",getNewLeadsDataIndia)
   .post("/updateleadstatus",updateLeadStatus)
-  .post("/updatedescription",updateLeadDescription)
   .post("/followupdetails",followUpDetails)
   .get("/getfollowupleadsdataindia",getFollowupLeadsDataIndia)
   .post("/addfeature",addFeature)
@@ -50,7 +51,11 @@ router.post("/createform", createForm)
   .get("/myleadsbooks",myLeadsBooks)
   .post("/businessstatus",businessStatus)
   .post("/uploadvideorecord/:id",upload.single('file'),uploadVideoRecord)
-
+  .post("/addvideofeature",addVideoFeature)
+  .post("/addnewleadfeature",addNewLeadFeature)
+  .get("/salessbooks",salesBooks)
+  .get("/salescampaignsindia",SalesCampaignsIndia)
+  .get("/salescampaignsbooks",SalesCampaignsBooks)
   
 
 

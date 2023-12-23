@@ -160,7 +160,15 @@ businessStatus:{
 },
 videoRecord:{
   type:Array
-}
+},
+videoFeatures:[{
+  featureName: { type: String },
+  featureDescription: { type: String },
+}],
+newLeadFeatures:[{
+  featureName: { type: String },
+  featureDescription: { type: String },
+}]
 
 });
 
