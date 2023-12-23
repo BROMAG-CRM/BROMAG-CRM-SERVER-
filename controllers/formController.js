@@ -194,7 +194,7 @@ const getAssignedBooks = async (req, res) => {
   const uniqueCitiesSet = new Set(forms.map(form => form.city));
   const uniqueCities = Array.from(uniqueCitiesSet);
 
-console.log(forms);
+
 
 const newLeads = forms.filter(form => form.leadStatus === "new-lead");
 const opened = forms.filter(form => form.leadStatus === "connected" || form.leadStatus === "follow-up" || form.leadStatus === "not-connected");
