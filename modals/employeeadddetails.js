@@ -138,6 +138,10 @@ const addDetailsEmployeeSchema = mongoose.Schema({
     type: String,
     default:"new-lead"
   },
+  booksLeadStatus:{
+    type: String,
+    default:"new-lead"
+  },
   followupDate:{
     type: String
   },
@@ -152,8 +156,27 @@ const addDetailsEmployeeSchema = mongoose.Schema({
     featureDescription: { type: String },
 }],
 callRecord:{
-  type:String
-}
+  type:Array
+},
+businessStatus:{
+  type:String,
+  default:"telemarketing"
+},
+booksBusinessStatus:{
+  type:String,
+  default:"telemarketing"
+},
+videoRecord:{
+  type:Array
+},
+videoFeatures:[{
+  featureName: { type: String },
+  featureDescription: { type: String },
+}],
+newLeadFeatures:[{
+  featureName: { type: String },
+  featureDescription: { type: String },
+}]
 
 });
 

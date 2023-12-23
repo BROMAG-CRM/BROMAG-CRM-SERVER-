@@ -21,6 +21,7 @@ const createUser = async (req, res) => {
 
 const getUser = async (req, res) => {
   try {
+    console.log(req.body);
     const { name, password } = req.body;
     const user = await User.findOne({ name });
 
@@ -41,8 +42,8 @@ const getUser = async (req, res) => {
         mobileNumber: user?.mobileNumber,
         email: user?.email,
         city: user?.city,
-        state: user?.state,
-        adminId:user?.adminId
+        state: isAdmin?user.name.split('@')[1]:user.state,
+        adminId: user?.adminId
       },
       process.env.SECRET_KEY,
       { expiresIn: "10000h" }
