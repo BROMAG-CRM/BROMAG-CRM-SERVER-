@@ -535,8 +535,15 @@ const uploadCallRecord = async (req, res) => {
 const uploadImage = async(req,res)=>{
   
     const { originalname, buffer } = req.file;
+    const {fieldName} = req.params
+
+    console.log(req.file);
+    console.log(fieldName);
   
     const uniqueKey = (await generateRandomString(16)) + originalname;
+
+    const folderName = fieldName; 
+    const key = `${folderName}/${uniqueKey}`;
   
     const s3Client = new S3Client({
       region: process.env.REGION,
@@ -550,11 +557,11 @@ const uploadImage = async(req,res)=>{
       const response = await s3Client.send(
         new PutObjectCommand({
           Bucket: process.env.BUCKET_NAME,
-          Key: uniqueKey,
+          Key: key,
           Body: buffer,
         })
       );
-      const fileUrl = `https://crms3-bucket.s3.ap-south-1.amazonaws.com/${uniqueKey}`;
+      const fileUrl = `https://crms3-bucket.s3.ap-south-1.amazonaws.com/${key}`;
       console.log("File uploaded successfully:", fileUrl);
   
       res.json({ fileUrl });
