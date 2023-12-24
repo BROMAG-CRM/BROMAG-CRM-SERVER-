@@ -496,6 +496,8 @@ const uploadCallRecord = async (req, res) => {
 
   const folderName = 'callRecords'; 
   const key = `${folderName}/${uniqueKey}`;
+  const bucketName = process.env.BUCKET_NAME;
+
 
   const s3Client = new S3Client({
     region: process.env.REGION,
@@ -508,13 +510,13 @@ const uploadCallRecord = async (req, res) => {
   try {
     const response = await s3Client.send(
       new PutObjectCommand({
-        Bucket: process.env.BUCKET_NAME,
+        Bucket: bucketName,
         Key: key,
         Body: buffer,
       })
     );
     // Log the URL of the uploaded file
-    const fileUrl = `https://crms3-bucket.s3.ap-south-1.amazonaws.com/${key}`;
+    const fileUrl = `https://${bucketName}.s3.ap-south-1.amazonaws.com/${key}`;
     console.log("File uploaded successfully:", fileUrl);
 
     await Form.updateOne(
@@ -535,8 +537,14 @@ const uploadCallRecord = async (req, res) => {
 const uploadImage = async(req,res)=>{
   
     const { originalname, buffer } = req.file;
+    const {fieldName} = req.params
   
     const uniqueKey = (await generateRandomString(16)) + originalname;
+
+    const folderName = fieldName; 
+    const key = `${folderName}/${uniqueKey}`;
+    const bucketName = process.env.BUCKET_NAME;
+
   
     const s3Client = new S3Client({
       region: process.env.REGION,
@@ -549,12 +557,12 @@ const uploadImage = async(req,res)=>{
     try {
       const response = await s3Client.send(
         new PutObjectCommand({
-          Bucket: process.env.BUCKET_NAME,
-          Key: uniqueKey,
+          Bucket: bucketName,
+          Key: key,
           Body: buffer,
         })
       );
-      const fileUrl = `https://crms3-bucket.s3.ap-south-1.amazonaws.com/${uniqueKey}`;
+      const fileUrl = `https://${bucketName}.s3.ap-south-1.amazonaws.com/${key}`;
       console.log("File uploaded successfully:", fileUrl);
   
       res.json({ fileUrl });
@@ -563,6 +571,59 @@ const uploadImage = async(req,res)=>{
       res.status(500).json({ error: 'Failed to upload file' });
     }
   };
+
+
+
+  const uploadVideoRecord = async(req,res)=> {
+
+
+    const { id } = req.params;
+    const { originalname, buffer } = req.file;
+
+    const uniqueKey = (await generateRandomString(16)) + originalname;
+    console.log(uniqueKey);
+
+    const folderName = 'videoRecords'; 
+    const key = `${folderName}/${uniqueKey}`;
+    const bucketName = process.env.BUCKET_NAME;
+
+  
+    const s3Client = new S3Client({
+      region: process.env.REGION,
+      credentials: {
+        accessKeyId: process.env.ACCESS_KEYID,
+        secretAccessKey: process.env.SECRETACCESS_KEY,
+      },
+    });
+    
+    try {
+      const response = await s3Client.send(
+        new PutObjectCommand({
+          Bucket: bucketName,
+          Key: key,
+          Body: buffer,
+        })
+      );
+      // Log the URL of the uploaded file
+      const fileUrl = `https://${bucketName}.s3.ap-south-1.amazonaws.com/${key}`;
+      console.log("File uploaded successfully:", fileUrl);
+  
+      await Form.updateOne(
+        { _id: id },
+        { $push: { videoRecord: fileUrl} }
+      )
+  
+      // Optionally, you can send the file URL as a response to the client
+      res.json({ fileUrl });
+  
+    } catch (error) {
+      console.error("Error uploading file to S3:", error);
+      res.status(500).json({ error: 'Failed to upload file' });
+    }
+
+  }
+
+
 
   const myLeadsBooks = async(req,res)=>{
     try {
@@ -621,53 +682,6 @@ try {
 
   }
 
-
-  const uploadVideoRecord = async(req,res)=> {
-
-
-    const { id } = req.params;
-    const { originalname, buffer } = req.file;
-
-    const uniqueKey = (await generateRandomString(16)) + originalname;
-    console.log(uniqueKey);
-
-    const folderName = 'videoRecords'; 
-    const key = `${folderName}/${uniqueKey}`;
-  
-    const s3Client = new S3Client({
-      region: process.env.REGION,
-      credentials: {
-        accessKeyId: process.env.ACCESS_KEYID,
-        secretAccessKey: process.env.SECRETACCESS_KEY,
-      },
-    });
-    
-    try {
-      const response = await s3Client.send(
-        new PutObjectCommand({
-          Bucket: process.env.BUCKET_NAME,
-          Key: key,
-          Body: buffer,
-        })
-      );
-      // Log the URL of the uploaded file
-      const fileUrl = `https://crms3-bucket.s3.ap-south-1.amazonaws.com/${key}`;
-      console.log("File uploaded successfully:", fileUrl);
-  
-      await Form.updateOne(
-        { _id: id },
-        { $push: { videoRecord: fileUrl} }
-      )
-  
-      // Optionally, you can send the file URL as a response to the client
-      res.json({ fileUrl });
-  
-    } catch (error) {
-      console.error("Error uploading file to S3:", error);
-      res.status(500).json({ error: 'Failed to upload file' });
-    }
-
-  }
 
 
   const addVideoFeature = async (req, res) => {
