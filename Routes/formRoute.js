@@ -68,10 +68,12 @@ router.post("/createform", createForm)
   .get("/booksfollowupinmarketing",booksFollowUpInMarkrting)
   .get("/booksnewleadinmarketing",booksNewLeadInMarkrting)
   .get("/booksnotconnectedinmarketing",booksNotConnectedInMarkrting)
+
   .get("/indiaconnectedinsales",indiaConnectedInSales)
   .get("/indiafollowupinsales",indiaFollowUpInSales)
   .get("/indianewleadsinsales",indiaNewLeadsInSales)
   .get("/indianotconnectedinsales",indiaNotConnectedInSales)
+  
   .get("/booksnewleadinsales",booksNewLeadInSales)
   .get("/booksfollowupinsales",booksFollowUpInSales)
   .get("/booksconnectedinsales",booksConnectedInSales)
