@@ -1080,7 +1080,7 @@ try {
           leadDescription: 1,
           followupTime: 1,
           followupDate: 1,
-          callRecord: 1
+          videoRecord: 1
         });
         console.log(forms);
   
@@ -1114,7 +1114,8 @@ try {
           designation: 1,
           contactPersonNumber: 1,
           city: 1,
-          newLeadFeatures: 1
+          newLeadFeatures: 1,
+          videoRecord: 1
         });
         console.log(forms);
   
