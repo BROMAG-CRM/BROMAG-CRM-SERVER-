@@ -16,7 +16,11 @@ booksNotConnectedInMarkrting,indiaConnectedInSales,
 indiaFollowUpInSales,indiaNewLeadsInSales,
 indiaNotConnectedInSales,booksNewLeadInSales,
 booksFollowUpInSales,booksConnectedInSales,
-booksNotConnectedInSales,updateBooksStatus
+booksNotConnectedInSales,updateBooksStatus,
+bdmCampaignsBooks,bdmCampaignsIndia,indiaConnectedInBdm,
+indiaFollowUpInBdm,indiaNewLeadsInBdm,indiaNotConnectedInBdm,
+booksNewLeadInBdm,booksFollowUpInBdm,booksConnectedInBdm,
+booksNotConnectedInBdm,addBdmFeature,updateBdmLocation
 
 } = require("../controllers/formController");
 
@@ -61,6 +65,8 @@ router.post("/createform", createForm)
   .post("/uploadvideorecord/:id",upload.single('file'),uploadVideoRecord)
   .post("/addvideofeature",addVideoFeature)
   .post("/addnewleadfeature",addNewLeadFeature)
+  .post("/addbdmfeature",addBdmFeature)
+
   .get("/salessbooks",salesBooks)
   .get("/salescampaignsindia",SalesCampaignsIndia)
   .get("/salescampaignsbooks",SalesCampaignsBooks)
@@ -68,17 +74,28 @@ router.post("/createform", createForm)
   .get("/booksfollowupinmarketing",booksFollowUpInMarkrting)
   .get("/booksnewleadinmarketing",booksNewLeadInMarkrting)
   .get("/booksnotconnectedinmarketing",booksNotConnectedInMarkrting)
-
   .get("/indiaconnectedinsales",indiaConnectedInSales)
   .get("/indiafollowupinsales",indiaFollowUpInSales)
   .get("/indianewleadsinsales",indiaNewLeadsInSales)
   .get("/indianotconnectedinsales",indiaNotConnectedInSales)
-  
   .get("/booksnewleadinsales",booksNewLeadInSales)
   .get("/booksfollowupinsales",booksFollowUpInSales)
   .get("/booksconnectedinsales",booksConnectedInSales)
   .get("/booksnotconnectedinsales",booksNotConnectedInSales)
   .post("/updatebooksstatus",updateBooksStatus)
+  .get("/bdmcampaignsindia",bdmCampaignsIndia)
+  .get("/bdmcampaignsbooks",bdmCampaignsBooks)
+  .get("/indiaconnectedinbdm",indiaConnectedInBdm)
+  .get("/indianotconnectedinbdm",indiaNotConnectedInBdm)
+  .get("/indiafollowupinbdm",indiaFollowUpInBdm)
+  .get("/indianewleadinbdm",indiaNewLeadsInBdm)
+
+  .get("/booksnewleadinbdm",booksNewLeadInBdm)
+  .get("/booksfollowupinbdm",booksFollowUpInBdm)
+  .get("/booksconnectedinbdm",booksConnectedInBdm)
+  .get("/booksnotconnectedinbdm",booksNotConnectedInBdm)
+
+  .post("/updatebdmlocation/:id",updateBdmLocation)
 
   
 
