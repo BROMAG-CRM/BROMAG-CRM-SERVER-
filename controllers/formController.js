@@ -1806,6 +1806,13 @@ const updateBdmLocation=async(req,res)=>{
 }
 
 
+const uploadSelfiPhoto = async(req,res)=>{
+
+console.log(req.file);
+console.log(req.params.id);
+
+}
+
 
 
 module.exports={
@@ -1830,7 +1837,8 @@ module.exports={
   bdmCampaignsBooks,bdmCampaignsIndia,indiaConnectedInBdm,
   indiaFollowUpInBdm,indiaNewLeadsInBdm,indiaNotConnectedInBdm,
   booksNewLeadInBdm,booksFollowUpInBdm,booksConnectedInBdm,
-  booksNotConnectedInBdm,addBdmFeature,updateBdmLocation
+  booksNotConnectedInBdm,addBdmFeature,updateBdmLocation,
+  uploadSelfiPhoto
 }
 
 
