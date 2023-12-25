@@ -174,7 +174,7 @@ const getAssignedBooks = async (req, res) => {
     if (isAdmin) {
       console.log(req.user);
       const adminId = req.user.userId
-      query = { adminId: adminId, billingSoftware:"no",telemarketing:"telemarketing"}; 
+      query = { adminId: adminId, billingSoftware:"no", booksBusinessStatus:"telemarketing"}; 
     }
 
     const forms = await Form.find(query)
@@ -660,13 +660,13 @@ try {
 
   console.log(req.body);
 
-  const {userId,newBusinessStatus} = req.body
+  const {userId,newBusinessStatus,leadStatus} = req.body
   const data = await Form.updateMany(
     { _id: userId },
     {
       $set: {
         businessStatus: newBusinessStatus,
-        leadStatus: "new-lead",
+        leadStatus: leadStatus,
       },
     }
   )
@@ -828,7 +828,7 @@ try {
       if (isAdmin) {
         console.log(req.user);
         const adminId = req.user.userId
-        query = { adminId: adminId, billingSoftware:"no",businessStatus:"telesales"}; 
+        query = { adminId: adminId, billingSoftware:"no",booksBusinessStatus:"telesales"}; 
       }
   
       const forms = await Form.find(query)
@@ -1043,7 +1043,8 @@ try {
           videoRecord: 1,
           status: 1,
           leadStatus: 1,
-          videoFeatures:1        
+          videoFeatures:1,
+          businessStatus:1        
         });
         console.log(forms);
   
@@ -1329,6 +1330,491 @@ const updateBooksStatus = async(req,res)=>{
 }
 
 
+
+const bdmCampaignsIndia = async(req,res)=>{
+  try {
+
+    console.log("uuuuyyyyyy")
+    const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+
+    let query = {};
+
+    if (isAdmin) {
+      console.log(req.user);
+      const adminId = req.user.userId
+      query = { adminId: adminId, businessStatus:"bdm" }; 
+    }
+
+    const forms = await Form.find(query)
+      .select({
+        brandName: 1,
+        restaurantMobileNumber: 1,
+        firmName: 1,
+        contactPersonname: 1,
+        designation: 1,
+        contactPersonNumber: 1,
+        city: 1,
+        leadStatus:1,
+        status:1,
+        adminId:1,
+        businessStatus:1
+      });
+
+    const uniqueCitiesSet = new Set(forms.map(form => form.city));
+    const uniqueCities = Array.from(uniqueCitiesSet);
+
+console.log(forms);
+
+const newLeads = forms.filter(form => form.leadStatus === "new-lead");
+const opened = forms.filter(form => form.leadStatus === "connected" || form.leadStatus === "follow-up" || form.leadStatus === "not-connected");
+const followUp = forms.filter(form => form.leadStatus === "follow-up");
+const connected = forms.filter(form => form.leadStatus === "connected");
+const notConnected = forms.filter(form => form.leadStatus === "not-connected");
+
+const newLeadsCount = newLeads.length;
+const openedCount = opened.length;
+const followUpCount = followUp.length;
+const connectedCount = connected.length;
+const notConnectedCount = notConnected.length;
+
+console.log("New Leads Count:", newLeadsCount);
+console.log("Opened Count:", openedCount);
+console.log("Follow Up Count:", followUpCount);
+console.log("Connected Count:", connectedCount);
+console.log("Not Connected Count:", notConnectedCount);
+console.log("uniqueCities:",uniqueCities);
+
+    return res.status(200).send({ data: { newLeadsCount,openedCount,followUpCount,connectedCount,notConnectedCount,uniqueCities } });
+  } catch (e) {
+    console.error("Error fetching forms:", e);
+    return res.status(500).send({ data: "Something went wrong while fetching the form" });
+  }
+}
+
+
+
+const bdmCampaignsBooks = async(req,res)=>{
+  try {
+    const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+
+    let query = {};
+
+    if (isAdmin) {
+      console.log(req.user);
+      const adminId = req.user.userId
+      query = { adminId: adminId, billingSoftware:"no",booksBusinessStatus:"bdm"}; 
+    }
+
+    const forms = await Form.find(query)
+    .select({
+      brandName: 1,
+      restaurantMobileNumber: 1,
+      firmName: 1,
+      contactPersonname: 1,
+      designation: 1,
+      contactPersonNumber: 1,
+      city: 1,
+      leadStatus:1,
+      status:1,
+      adminId:1,
+      booksBusinessStatus:1,
+      booksLeadStatus:1,
+      billingSoftware:1
+
+
+    });
+
+  const uniqueCitiesSet = new Set(forms.map(form => form.city));
+  const uniqueCities = Array.from(uniqueCitiesSet);
+
+console.log(forms);
+
+const newLeads = forms.filter(form => form.leadStatus === "new-lead");
+const opened = forms.filter(form => form.leadStatus === "connected" || form.leadStatus === "follow-up" || form.leadStatus === "not-connected");
+const followUp = forms.filter(form => form.leadStatus === "follow-up");
+const connected = forms.filter(form => form.leadStatus === "connected");
+const notConnected = forms.filter(form => form.leadStatus === "not-connected");
+
+const newLeadsCount = newLeads.length;
+const openedCount = opened.length;
+const followUpCount = followUp.length;
+const connectedCount = connected.length;
+const notConnectedCount = notConnected.length;
+
+console.log("New Leads Count:", newLeadsCount);
+console.log("Opened Count:", openedCount);
+console.log("Follow Up Count:", followUpCount);
+console.log("Connected Count:", connectedCount);
+console.log("Not Connected Count:", notConnectedCount);
+console.log("uniqueCities:",uniqueCities);
+
+  return res.status(200).send({ data: { newLeadsCount,openedCount,followUpCount,connectedCount,notConnectedCount,uniqueCities } });
+  } catch (e) {
+    console.error("Error fetching forms:", e);
+    return res.status(500).send({ data: "Something went wrong while fetching the form" });
+  }
+
+}
+
+
+
+const indiaConnectedInBdm = async(req,res)=>{
+  try {
+    const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+
+    let query = {};
+
+    if (isAdmin) {
+      const adminId = req.user.userId
+      query = { adminId: adminId, status: "Hot", leadStatus:"connected",businessStatus:"bdm"}; 
+    }
+
+    const forms = await Form.find(query)
+      .select({
+        brandName: 1,
+        restaurantMobileNumber: 1,
+        firmName: 1,
+        contactPersonname: 1,
+        designation: 1,
+        contactPersonNumber: 1,
+        city: 1,
+        leadDescription: 1,
+        status: 1,
+        leadStatus: 1,
+        bdmFeatures:1,
+        locationBdm:1        
+      });
+      console.log(forms);
+
+    return res.status(200).send({ data:  forms });
+  } catch (e) {
+    console.error("Error fetching forms:", e);
+    return res.status(500).send({ data: "Something went wrong while fetching the form" });
+  }
+
+}
+
+
+
+
+
+const indiaFollowUpInBdm = async(req,res)=>{
+
+  try {
+    const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+
+    let query = {};
+
+    if (isAdmin) {
+      const adminId = req.user.userId
+      query = { adminId: adminId, status: "Hot" ,leadStatus:"follow-up",businessStatus:"bdm"}; 
+    }
+
+    const forms = await Form.find(query)
+      .select({
+        brandName: 1,
+        restaurantMobileNumber: 1,
+        firmName: 1,
+        contactPersonname: 1,
+        designation: 1,
+        contactPersonNumber: 1,
+        city: 1,
+        leadDescription: 1,
+        followupTime: 1,
+        followupDate: 1,
+        bdmFeatures:1,
+        locationBdm:1  
+      });
+      console.log(forms);
+
+    return res.status(200).send({ data:  forms });
+  } catch (e) {
+    console.error("Error fetching forms:", e);
+    return res.status(500).send({ data: "Something went wrong while fetching the form" });
+  }
+
+}
+
+
+const indiaNewLeadsInBdm =async(req,res)=>{
+
+  try {
+    const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+
+    let query = {};
+
+    if (isAdmin) {
+      const adminId = req.user.userId
+      query = { adminId: adminId, status: "Hot", leadStatus:"new-lead",businessStatus:"bdm"}; 
+    }
+
+    const forms = await Form.find(query)
+      .select({
+        brandName: 1,
+        restaurantMobileNumber: 1,
+        firmName: 1,
+        contactPersonname: 1,
+        designation: 1,
+        contactPersonNumber: 1,
+        city: 1,
+        newLeadFeatures: 1,
+        bdmFeatures:1,
+        locationBdm:1  
+      });
+      console.log(forms);
+      console.log("forms");
+
+    return res.status(200).send({ data:  forms });
+  } catch (e) {
+    console.error("Error fetching forms:", e);
+    return res.status(500).send({ data: "Something went wrong while fetching the form" });
+  }
+
+}
+
+
+const indiaNotConnectedInBdm = async(req,res)=> {
+
+  try {
+    const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+
+    let query = {};
+
+    if (isAdmin) {
+      const adminId = req.user.userId
+      query = { adminId: adminId, status: "Hot", leadStatus:"not-connected" ,businessStatus:"bdm"}; 
+    }
+
+    const forms = await Form.find(query)
+      .select({
+        brandName: 1,
+        restaurantMobileNumber: 1,
+        firmName: 1,
+        contactPersonname: 1,
+        designation: 1,
+        contactPersonNumber: 1,
+        city: 1,
+        leadDescription: 1,
+        bdmFeatures:1,
+        locationBdm:1  
+      });
+      console.log(forms);
+
+    return res.status(200).send({ data:  forms });
+  } catch (e) {
+    console.error("Error fetching forms:", e);
+    return res.status(500).send({ data: "Something went wrong while fetching the form" });
+  }
+
+}
+
+
+
+
+const booksNewLeadInBdm = async(req,res)=>{
+
+  try {
+    const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+
+    let query = {};
+
+    if (isAdmin) {
+      const adminId = req.user.userId
+      query = { adminId: adminId, status: "Hot", booksLeadStatus:"new-lead",booksBusinessStatus:"bdm" ,billingSoftware:"no"}; 
+    }
+
+    const forms = await Form.find(query)
+      .select({
+        brandName: 1,
+        restaurantMobileNumber: 1,
+        firmName: 1,
+        contactPersonname: 1,
+        designation: 1,
+        contactPersonNumber: 1,
+        city: 1,
+        newLeadFeatures: 1,
+        businessStatus:1
+      });
+      console.log(forms);
+
+    return res.status(200).send({ data:  forms });
+  } catch (e) {
+    console.error("Error fetching forms:", e);
+    return res.status(500).send({ data: "Something went wrong while fetching the form" });
+  }
+
+}
+
+
+const booksFollowUpInBdm = async(req,res)=>{
+  try {
+    const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+
+    let query = {};
+
+    if (isAdmin) {
+      const adminId = req.user.userId
+      query = { adminId: adminId, status: "Hot" ,booksLeadStatus:"follow-up",booksBusinessStatus:"bdm" ,billingSoftware:"no"}; 
+    }
+
+    const forms = await Form.find(query)
+      .select({
+        brandName: 1,
+        restaurantMobileNumber: 1,
+        firmName: 1,
+        contactPersonname: 1,
+        designation: 1,
+        contactPersonNumber: 1,
+        city: 1,
+        leadDescription: 1,
+        followupTime: 1,
+        followupDate: 1,
+        callRecord: 1
+      });
+      console.log(forms);
+
+    return res.status(200).send({ data:  forms });
+  } catch (e) {
+    console.error("Error fetching forms:", e);
+    return res.status(500).send({ data: "Something went wrong while fetching the form" });
+  }
+}
+
+
+
+const booksConnectedInBdm = async(req,res)=>{
+
+
+try {
+  const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+
+  let query = {};
+
+  if (isAdmin) {
+    const adminId = req.user.userId
+    query = { adminId: adminId, status: "Hot", booksLeadStatus:"connected",booksBusinessStatus:"bdm" ,billingSoftware:"no"}; 
+  }
+
+  const forms = await Form.find(query)
+    .select({
+      brandName: 1,
+      restaurantMobileNumber: 1,
+      firmName: 1,
+      contactPersonname: 1,
+      designation: 1,
+      contactPersonNumber: 1,
+      city: 1,
+      leadDescription: 1,
+      callRecord:1,
+      features:1,
+      status: 1,
+      leadStatus: 1,        
+    });
+    console.log(forms);
+
+  return res.status(200).send({ data:  forms });
+} catch (e) {
+  console.error("Error fetching forms:", e);
+  return res.status(500).send({ data: "Something went wrong while fetching the form" });
+}
+
+}
+
+
+const booksNotConnectedInBdm = async(req,res)=>{
+
+
+try {
+  const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+
+  let query = {};
+
+  if (isAdmin) {
+    const adminId = req.user.userId
+    query = { adminId: adminId, status: "Hot", booksLeadStatus:"not-connected" ,booksBusinessStatus:"bdm",billingSoftware:"no"}; 
+  }
+
+  const forms = await Form.find(query)
+    .select({
+      brandName: 1,
+      restaurantMobileNumber: 1,
+      firmName: 1,
+      contactPersonname: 1,
+      designation: 1,
+      contactPersonNumber: 1,
+      city: 1,
+      leadDescription: 1,
+    });
+    console.log(forms);
+
+  return res.status(200).send({ data:  forms });
+} catch (e) {
+  console.error("Error fetching forms:", e);
+  return res.status(500).send({ data: "Something went wrong while fetching the form" });
+}
+
+
+}
+
+
+const addBdmFeature = async (req, res) => {
+  try {
+    console.log("loooooooo");
+    const { featureName, featureDescription, id } = req.body;
+    console.log(req.body);
+
+    const result = await Form.updateOne(
+      { _id: id },
+      {
+        $push: {
+          bdmFeatures: {featureName, featureDescription}
+        },
+      }
+    );
+    
+    return res.status(200).json({ data: result });
+  } catch (error) {
+    console.error("Error updating feature:", error);
+    return res.status(500).send("Something went wrong while updating feature");
+  }
+};
+
+
+
+const updateBdmLocation=async(req,res)=>{
+
+  const {location} = req.body
+  console.log(location)
+  console.log("locatoipmnnnnn")
+  const { id } = req.params;
+  console.log(id)
+  try {
+    const result = await Form.updateOne(
+      { _id: id },
+      {
+        $set: {
+          locationBdm: location
+        },
+      }
+    );
+    
+    // const result = await Form.updateOne(id,{$push:{locationBdm:req.body.location}});
+    return res.status(200).send({ data: result });
+  } catch (e) {
+    return res.status(500).send("Something went wrong while updating form");
+  }
+}
+
+
+const uploadSelfiPhoto = async(req,res)=>{
+
+console.log(req.file);
+console.log(req.params.id);
+
+}
+
+
+
 module.exports={
   createForm,getForm,updateForm,getUsers,
   updateUser,getAssignedIndia,deleteUser
@@ -1347,7 +1833,12 @@ module.exports={
   indiaFollowUpInSales,indiaNewLeadsInSales,
   indiaNotConnectedInSales,booksNewLeadInSales,
   booksFollowUpInSales,booksConnectedInSales,
-  booksNotConnectedInSales,updateBooksStatus
+  booksNotConnectedInSales,updateBooksStatus,
+  bdmCampaignsBooks,bdmCampaignsIndia,indiaConnectedInBdm,
+  indiaFollowUpInBdm,indiaNewLeadsInBdm,indiaNotConnectedInBdm,
+  booksNewLeadInBdm,booksFollowUpInBdm,booksConnectedInBdm,
+  booksNotConnectedInBdm,addBdmFeature,updateBdmLocation,
+  uploadSelfiPhoto
 }
 
 
