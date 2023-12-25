@@ -176,7 +176,17 @@ videoFeatures:[{
 newLeadFeatures:[{
   featureName: { type: String },
   featureDescription: { type: String },
-}]
+}],
+bdmFeatures:[{
+  featureName: { type: String },
+  featureDescription: { type: String },
+}],
+locationBdm: {
+  latitude: { type: Number },
+  longitude: { type: Number },
+  locationName: { type: String }
+}
+
 
 });
 
