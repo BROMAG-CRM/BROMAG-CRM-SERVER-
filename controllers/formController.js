@@ -174,7 +174,7 @@ const getAssignedBooks = async (req, res) => {
     if (isAdmin) {
       console.log(req.user);
       const adminId = req.user.userId
-      query = { adminId: adminId, billingSoftware:"no",telemarketing:"telemarketing"}; 
+      query = { adminId: adminId, billingSoftware:"no", booksBusinessStatus:"telemarketing"}; 
     }
 
     const forms = await Form.find(query)
@@ -828,7 +828,7 @@ try {
       if (isAdmin) {
         console.log(req.user);
         const adminId = req.user.userId
-        query = { adminId: adminId, billingSoftware:"no",businessStatus:"telesales"}; 
+        query = { adminId: adminId, billingSoftware:"no",booksBusinessStatus:"telesales"}; 
       }
   
       const forms = await Form.find(query)
@@ -1402,7 +1402,7 @@ const bdmCampaignsBooks = async(req,res)=>{
     if (isAdmin) {
       console.log(req.user);
       const adminId = req.user.userId
-      query = { adminId: adminId, billingSoftware:"no",businessStatus:"bdm"}; 
+      query = { adminId: adminId, billingSoftware:"no",booksBusinessStatus:"bdm"}; 
     }
 
     const forms = await Form.find(query)
@@ -1418,7 +1418,8 @@ const bdmCampaignsBooks = async(req,res)=>{
       status:1,
       adminId:1,
       booksBusinessStatus:1,
-      booksLeadStatus:1
+      booksLeadStatus:1,
+      billingSoftware:1
 
 
     });
@@ -1619,7 +1620,7 @@ const booksNewLeadInBdm = async(req,res)=>{
 
     if (isAdmin) {
       const adminId = req.user.userId
-      query = { adminId: adminId, status: "Hot", booksLeadStatus:"new-lead",booksBusinessStatus:"Bdm" ,billingSoftware:"no"}; 
+      query = { adminId: adminId, status: "Hot", booksLeadStatus:"new-lead",booksBusinessStatus:"bdm" ,billingSoftware:"no"}; 
     }
 
     const forms = await Form.find(query)
@@ -1653,7 +1654,7 @@ const booksFollowUpInBdm = async(req,res)=>{
 
     if (isAdmin) {
       const adminId = req.user.userId
-      query = { adminId: adminId, status: "Hot" ,booksLeadStatus:"follow-up",booksBusinessStatus:"Bdm" ,billingSoftware:"no"}; 
+      query = { adminId: adminId, status: "Hot" ,booksLeadStatus:"follow-up",booksBusinessStatus:"bdm" ,billingSoftware:"no"}; 
     }
 
     const forms = await Form.find(query)
@@ -1691,7 +1692,7 @@ try {
 
   if (isAdmin) {
     const adminId = req.user.userId
-    query = { adminId: adminId, status: "Hot", booksLeadStatus:"connected",booksBusinessStatus:"Bdm" ,billingSoftware:"no"}; 
+    query = { adminId: adminId, status: "Hot", booksLeadStatus:"connected",booksBusinessStatus:"bdm" ,billingSoftware:"no"}; 
   }
 
   const forms = await Form.find(query)
@@ -1730,7 +1731,7 @@ try {
 
   if (isAdmin) {
     const adminId = req.user.userId
-    query = { adminId: adminId, status: "Hot", booksLeadStatus:"not-connected" ,booksBusinessStatus:"Bdm",billingSoftware:"no"}; 
+    query = { adminId: adminId, status: "Hot", booksLeadStatus:"not-connected" ,booksBusinessStatus:"bdm",billingSoftware:"no"}; 
   }
 
   const forms = await Form.find(query)
