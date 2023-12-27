@@ -148,9 +148,6 @@ const addDetailsEmployeeSchema = mongoose.Schema({
   followupTime:{
     type:String
   },
-  leadDescription:{
-    type:String
-  },
   features:[{
     featureName: { type: String },
     featureDescription: { type: String },
@@ -173,7 +170,7 @@ videoFeatures:[{
   featureName: { type: String },
   featureDescription: { type: String },
 }],
-newLeadFeatures:[{
+introduction:[{
   featureName: { type: String },
   featureDescription: { type: String },
 }],
@@ -185,6 +182,9 @@ locationBdm: {
   latitude: { type: Number },
   longitude: { type: Number },
   locationName: { type: String }
+},
+bdmSelfie: {
+  type:String
 }
 
 

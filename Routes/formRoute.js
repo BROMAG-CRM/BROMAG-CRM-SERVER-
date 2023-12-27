@@ -9,7 +9,7 @@ getFollowupLeadsDataIndia,addFeature,getConnectedLeadsDataIndia,
 getNotConnectedLeadsDataIndia,progressLeadsData
 ,uploadCallRecord,uploadImage,getAssignedBooks,
 businessStatus,uploadVideoRecord,addVideoFeature,
-addNewLeadFeature,salesBooks,SalesCampaignsIndia,
+addIntroduction,salesBooks,SalesCampaignsIndia,
 SalesCampaignsBooks,booksConnectedInMarkrting,
 booksFollowUpInMarkrting,booksNewLeadInMarkrting,
 booksNotConnectedInMarkrting,indiaConnectedInSales,
@@ -65,7 +65,7 @@ router.post("/createform", createForm)
   .post("/businessstatus",businessStatus)
   .post("/uploadvideorecord/:id",upload.single('file'),uploadVideoRecord)
   .post("/addvideofeature",addVideoFeature)
-  .post("/addnewleadfeature",addNewLeadFeature)
+  .post("/addintroduction",addIntroduction)
   .post("/addbdmfeature",addBdmFeature)
 
   .get("/salessbooks",salesBooks)
