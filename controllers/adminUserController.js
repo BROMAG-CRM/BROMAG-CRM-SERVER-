@@ -1,23 +1,37 @@
 const User = require("../modals/adminUserModal");
 const jwt = require("jsonwebtoken");
 const get = require("lodash");
+const { nanoid } = require('nanoid');
+
 
 const createUser = async (req, res) => {
   try {
     const { name } = req.body;
     const findUser = await User.find({ name });
+
     if (findUser.length !== 0) {
-      return res.status(500).send({ message: "user already exists" });
+      return res.status(500).send({ message: "User already exists" });
     } else {
-      const result = await User.create({ ...req.body });
-      return res.status(200).send({ mesage: result });
+      const uniqueId = nanoid(); // Generate a short and unique ID
+
+      // console.log(uniqueId)
+      // let num = 0;
+      // num++;
+      // const uniqueId = `BRMG${num}`
+
+      const result = await User.create({ ...req.body, uniqueId });
+      return res.status(200).send({ message: result, uniqueId });
     }
   } catch (e) {
+    console.error(e);
     return res
       .status(500)
-      .send({ message: "something went wrong while creating a new user" });
+      .send({ message: "Something went wrong while creating a new user" });
   }
 };
+
+
+
 
 const getUser = async (req, res) => {
   try {
@@ -33,6 +47,7 @@ const getUser = async (req, res) => {
       return res.status(400).send({ message: "Incorrect password" });
     }
 
+
     const isAdmin = user.name.toLowerCase().startsWith("admin")
 
     const token = jwt.sign(
@@ -43,7 +58,8 @@ const getUser = async (req, res) => {
         email: user?.email,
         city: user?.city,
         state: isAdmin?user.name.split('@')[1]:user.state,
-        adminId: user?.adminId
+        adminId: user?.adminId,
+        role: user?.role
       },
       process.env.SECRET_KEY,
       { expiresIn: "10000h" }

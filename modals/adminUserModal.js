@@ -31,6 +31,12 @@ const adminUserSchema = mongoose.Schema({
   joiningDate:{
     type:Date,
     default:Date.now
+  },
+  role:{
+    type:String
+  },
+  uniqueId:{
+    
   }  
 
 });
