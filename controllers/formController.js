@@ -267,8 +267,8 @@ const getNewLeadsDataIndia = async (req,res) => {
         city: 1,
         newLeadFeatures: 1,
         businessStatus:1,
-        callRecord:1
-
+        callRecord:1,
+        introduction:1
       });
       console.log(forms);
 
