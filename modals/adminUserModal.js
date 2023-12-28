@@ -36,7 +36,7 @@ const adminUserSchema = mongoose.Schema({
     type:String
   },
   uniqueId:{
-    
+    type:String
   }  
 
 });

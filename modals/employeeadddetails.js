@@ -185,7 +185,11 @@ locationBdm: {
 },
 bdmSelfie: {
   type:String
-}
+},
+createdDate:{
+  type:Date,
+  default:Date.now
+},
 
 
 });
