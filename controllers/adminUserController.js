@@ -1,7 +1,10 @@
 const User = require("../modals/adminUserModal");
 const jwt = require("jsonwebtoken");
 const get = require("lodash");
-const { nanoid } = require('nanoid');
+const { customRandom } = require('nanoid');
+const seedrandom = require('seedrandom');
+
+
 
 
 const createUser = async (req, res) => {
@@ -12,12 +15,14 @@ const createUser = async (req, res) => {
     if (findUser.length !== 0) {
       return res.status(500).send({ message: "User already exists" });
     } else {
-      const uniqueId = nanoid(); // Generate a short and unique ID
+      // Use the current timestamp as a seed
+      const seed = String(Date.now());
+      const rng = seedrandom(seed);
+      const nanoid = customRandom('BROMAGINDIA', 5, size => {
+        return new Uint8Array(size).map(() => 256 * rng());
+      });
 
-      // console.log(uniqueId)
-      // let num = 0;
-      // num++;
-      // const uniqueId = `BRMG${num}`
+      const uniqueId = nanoid(); // Generate a short and unique ID
 
       const result = await User.create({ ...req.body, uniqueId });
       return res.status(200).send({ message: result, uniqueId });
