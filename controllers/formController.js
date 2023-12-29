@@ -6,6 +6,7 @@ const { PutObjectCommand, S3Client } = require('@aws-sdk/client-s3');
 const createForm = async (req, res) => {
   try {
     const result=await Form.create({...req.body})
+    console.log(result)
     return res.status(200).send({data:result._id})
   } catch (e) {
     return res.status(200).send({data:"Something went wrong while creating the form"})
@@ -23,12 +24,28 @@ const getForm = async (req, res) => {
 
     if (isAdmin) {
       const adminId = req.user.userId
-      query = { adminId: adminId, firmOption: category}; 
-    }
+      query = {
+        adminId: adminId,
+        firmOption: category,
+        $or: [
+          { businessStatus: "telemarketing" },
+          { businessStatus: "telesales" },
+          { businessStatus: "bdm" }
+        ]
+      };
+          }
 
     else {
       const userState = req.user.state
-      query = { state:userState , firmOption: category}; 
+      query = { 
+        state:userState , 
+        firmOption: category,
+        $or: [
+          { businessStatus: "telemarketing" },
+          { businessStatus: "telesales" },
+          { businessStatus: "bdm" }
+        ]
+      }; 
     }
 
     const result = await Form.find(query);

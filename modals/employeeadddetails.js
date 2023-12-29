@@ -157,11 +157,11 @@ callRecord:{
 },
 businessStatus:{
   type:String,
-  default:"telemarketing"
+  default:"pending"
 },
 booksBusinessStatus:{
   type:String,
-  default:"telemarketing"
+  default:"pending"
 },
 videoRecord:{
   type:Array
