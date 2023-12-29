@@ -130,7 +130,7 @@ const addDetailsEmployeeSchema = mongoose.Schema({
     type:String,
     required: true
   },
-  adminId:{
+  adminId: {
     type:String,
     required: true
   },

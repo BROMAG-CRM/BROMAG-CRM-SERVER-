@@ -2011,6 +2011,106 @@ try {
 }
 
 
+const getPendingForm = async(req,res)=>{
+
+  try {
+    const {type} = req.params
+    const employeeId = req.user.userId
+
+    let query = {};
+
+
+    if(type==='india'){
+      console.log(type);
+      query = { 
+        employeeId: employeeId, 
+        businessStatus: "pending",
+        billingSoftware:"yes"  
+    }
+    }else{
+      console.log(type);
+      query = { 
+        employeeId: employeeId, 
+        booksBusinessStatus: "pending"  
+    }
+
+    } 
+
+    const result = await Form.find(query);
+    console.log(result)
+    return res.status(200).send({ data: result });
+  } catch (e) {
+    return res.status(500).send({ data: "Something went wrong while fetching the form" });
+  }
+
+}
+
+
+
+const getCompletedForm = async(req,res)=>{
+
+  try {
+    const {type} = req.params
+    const employeeId = req.user.userId
+
+    let query = {};
+
+
+    if(type==='india'){
+      console.log(type);
+      query = { 
+        employeeId: employeeId, 
+        businessStatus: "completed",
+        billingSoftware:"yes"  
+    }
+    }else{
+      console.log(type);
+      query = { 
+        employeeId: employeeId, 
+        booksBusinessStatus: "completed"  
+    }
+
+    } 
+
+    const result = await Form.find(query);
+    return res.status(200).send({ data: result });
+  } catch (e) {
+    return res.status(500).send({ data: "Something went wrong while fetching the form" });
+  }
+
+}
+
+
+
+
+const booksBusinessStatus = async(req,res)=>{
+  try {
+  
+    const {userId,newBusinessStatus,leadStatus} = req.body
+  
+    const data = await Form.updateMany(
+      { _id: userId },
+      {
+        $set: {
+          booksBusinessStatus: newBusinessStatus,
+          booksLeadStatus: leadStatus,
+        },
+      }
+    )
+    res.status(200).json({});
+  
+  ;
+    
+  
+  } catch (e) {
+    console.error("Error updating forms:", e);
+    return res.status(500).send({ data: "Something went wrong while updating the form" });
+  }
+  
+    }
+  
+
+
 
 module.exports={
   createForm,getForm,updateForm,getUsers,
@@ -2035,7 +2135,8 @@ module.exports={
   indiaFollowUpInBdm,indiaNewLeadsInBdm,indiaNotConnectedInBdm,
   booksNewLeadInBdm,booksFollowUpInBdm,booksConnectedInBdm,
   booksNotConnectedInBdm,addBdmFeature,updateBdmLocation,
-  uploadSelfiPhoto
+  uploadSelfiPhoto,getPendingForm,getCompletedForm,
+  booksBusinessStatus
 }
 
 
