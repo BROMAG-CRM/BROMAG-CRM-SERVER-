@@ -157,11 +157,11 @@ callRecord:{
 },
 businessStatus:{
   type:String,
-  default:"telemarketing"
+  default:"pending"
 },
 booksBusinessStatus:{
   type:String,
-  default:"telemarketing"
+  default:"pending"
 },
 videoRecord:{
   type:Array
@@ -185,7 +185,11 @@ locationBdm: {
 },
 bdmSelfie: {
   type:String
-}
+},
+createdDate:{
+  type:Date,
+  default:Date.now
+},
 
 
 });
