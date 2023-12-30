@@ -147,43 +147,22 @@ const getAssignedIndia = async (req, res) => {
 
     const forms = await Form.find(query)
       .select({
-        brandName: 1,
-        restaurantMobileNumber: 1,
-        firmName: 1,
-        contactPersonname: 1,
-        designation: 1,
-        contactPersonNumber: 1,
-        city: 1,
         leadStatus:1,
-        status:1,
-        adminId:1
+        address:1
       });
 
-    const uniqueCitiesSet = new Set(forms.map(form => form.city));
-    const uniqueCities = Array.from(uniqueCitiesSet);
+const uniqueCitiesSet = new Set();
 
-console.log(forms);
+forms.forEach(form => {
+  form.address.forEach(address => {
+    uniqueCitiesSet.add(address.locationCity);
+  });
+});
 
-const newLeads = forms.filter(form => form.leadStatus === "new-lead");
-const opened = forms.filter(form => form.leadStatus === "connected" || form.leadStatus === "follow-up" || form.leadStatus === "not-connected");
-const followUp = forms.filter(form => form.leadStatus === "follow-up");
-const connected = forms.filter(form => form.leadStatus === "connected");
-const notConnected = forms.filter(form => form.leadStatus === "not-connected");
+const uniqueCities = Array.from(uniqueCitiesSet);
 
-const newLeadsCount = newLeads.length;
-const openedCount = opened.length;
-const followUpCount = followUp.length;
-const connectedCount = connected.length;
-const notConnectedCount = notConnected.length;
+return res.status(200).send({data:{forms,uniqueCities}});
 
-console.log("New Leads Count:", newLeadsCount);
-console.log("Opened Count:", openedCount);
-console.log("Follow Up Count:", followUpCount);
-console.log("Connected Count:", connectedCount);
-console.log("Not Connected Count:", notConnectedCount);
-console.log("uniqueCities:",uniqueCities);
-
-    return res.status(200).send({ data: { newLeadsCount,openedCount,followUpCount,connectedCount,notConnectedCount,uniqueCities } });
   } catch (e) {
     console.error("Error fetching forms:", e);
     return res.status(500).send({ data: "Something went wrong while fetching the form" });
@@ -209,43 +188,21 @@ const getAssignedBooks = async (req, res) => {
 
     const forms = await Form.find(query)
     .select({
-      brandName: 1,
-      restaurantMobileNumber: 1,
-      firmName: 1,
-      contactPersonname: 1,
-      designation: 1,
-      contactPersonNumber: 1,
-      city: 1,
-      leadStatus:1,
-      status:1,
-      adminId:1
+      booksLeadStatus:1,
+      address:1
     });
+const uniqueCitiesSet = new Set();
 
-  const uniqueCitiesSet = new Set(forms.map(form => form.city));
-  const uniqueCities = Array.from(uniqueCitiesSet);
+forms.forEach(form => {
+  form.address.forEach(address => {
+    uniqueCitiesSet.add(address.locationCity);
+  });
+});
 
+const uniqueCities = Array.from(uniqueCitiesSet);
 
+return res.status(200).send({data:{forms,uniqueCities}});
 
-const newLeads = forms.filter(form => form.leadStatus === "new-lead");
-const opened = forms.filter(form => form.leadStatus === "connected" || form.leadStatus === "follow-up" || form.leadStatus === "not-connected");
-const followUp = forms.filter(form => form.leadStatus === "follow-up");
-const connected = forms.filter(form => form.leadStatus === "connected");
-const notConnected = forms.filter(form => form.leadStatus === "not-connected");
-
-const newLeadsCount = newLeads.length;
-const openedCount = opened.length;
-const followUpCount = followUp.length;
-const connectedCount = connected.length;
-const notConnectedCount = notConnected.length;
-
-console.log("New Leads Count:", newLeadsCount);
-console.log("Opened Count:", openedCount);
-console.log("Follow Up Count:", followUpCount);
-console.log("Connected Count:", connectedCount);
-console.log("Not Connected Count:", notConnectedCount);
-console.log("uniqueCities:",uniqueCities);
-
-  return res.status(200).send({ data: { newLeadsCount,openedCount,followUpCount,connectedCount,notConnectedCount,uniqueCities } });
   } catch (e) {
     console.error("Error fetching forms:", e);
     return res.status(500).send({ data: "Something went wrong while fetching the form" });
@@ -839,43 +796,22 @@ try {
   
       const forms = await Form.find(query)
         .select({
-          brandName: 1,
-          restaurantMobileNumber: 1,
-          firmName: 1,
-          contactPersonname: 1,
-          designation: 1,
-          contactPersonNumber: 1,
-          city: 1,
           leadStatus:1,
-          status:1,
-          adminId:1
+          address:1
         });
   
-      const uniqueCitiesSet = new Set(forms.map(form => form.city));
-      const uniqueCities = Array.from(uniqueCitiesSet);
+        const uniqueCitiesSet = new Set();
+
+        forms.forEach(form => {
+          form.address.forEach(address => {
+            uniqueCitiesSet.add(address.locationCity);
+          });
+        });
+        
+        const uniqueCities = Array.from(uniqueCitiesSet);
+        
+        return res.status(200).send({data:{forms,uniqueCities}});
   
-  console.log(forms);
-  
-  const newLeads = forms.filter(form => form.leadStatus === "new-lead");
-  const opened = forms.filter(form => form.leadStatus === "connected" || form.leadStatus === "follow-up" || form.leadStatus === "not-connected");
-  const followUp = forms.filter(form => form.leadStatus === "follow-up");
-  const connected = forms.filter(form => form.leadStatus === "connected");
-  const notConnected = forms.filter(form => form.leadStatus === "not-connected");
-  
-  const newLeadsCount = newLeads.length;
-  const openedCount = opened.length;
-  const followUpCount = followUp.length;
-  const connectedCount = connected.length;
-  const notConnectedCount = notConnected.length;
-  
-  console.log("New Leads Count:", newLeadsCount);
-  console.log("Opened Count:", openedCount);
-  console.log("Follow Up Count:", followUpCount);
-  console.log("Connected Count:", connectedCount);
-  console.log("Not Connected Count:", notConnectedCount);
-  console.log("uniqueCities:",uniqueCities);
-  
-      return res.status(200).send({ data: { newLeadsCount,openedCount,followUpCount,connectedCount,notConnectedCount,uniqueCities } });
     } catch (e) {
       console.error("Error fetching forms:", e);
       return res.status(500).send({ data: "Something went wrong while fetching the form" });
@@ -900,43 +836,22 @@ try {
   
       const forms = await Form.find(query)
       .select({
-        brandName: 1,
-        restaurantMobileNumber: 1,
-        firmName: 1,
-        contactPersonname: 1,
-        designation: 1,
-        contactPersonNumber: 1,
-        city: 1,
-        leadStatus:1,
-        status:1,
-        adminId:1
+        booksLeadStatus:1,
+        address:1
       });
   
-    const uniqueCitiesSet = new Set(forms.map(form => form.city));
-    const uniqueCities = Array.from(uniqueCitiesSet);
+      const uniqueCitiesSet = new Set();
+
+      forms.forEach(form => {
+        form.address.forEach(address => {
+          uniqueCitiesSet.add(address.locationCity);
+        });
+      });
+      
+      const uniqueCities = Array.from(uniqueCitiesSet);
+      
+      return res.status(200).send({data:{forms,uniqueCities}});
   
-  console.log(forms);
-  
-  const newLeads = forms.filter(form => form.leadStatus === "new-lead");
-  const opened = forms.filter(form => form.leadStatus === "connected" || form.leadStatus === "follow-up" || form.leadStatus === "not-connected");
-  const followUp = forms.filter(form => form.leadStatus === "follow-up");
-  const connected = forms.filter(form => form.leadStatus === "connected");
-  const notConnected = forms.filter(form => form.leadStatus === "not-connected");
-  
-  const newLeadsCount = newLeads.length;
-  const openedCount = opened.length;
-  const followUpCount = followUp.length;
-  const connectedCount = connected.length;
-  const notConnectedCount = notConnected.length;
-  
-  console.log("New Leads Count:", newLeadsCount);
-  console.log("Opened Count:", openedCount);
-  console.log("Follow Up Count:", followUpCount);
-  console.log("Connected Count:", connectedCount);
-  console.log("Not Connected Count:", notConnectedCount);
-  console.log("uniqueCities:",uniqueCities);
-  
-    return res.status(200).send({ data: { newLeadsCount,openedCount,followUpCount,connectedCount,notConnectedCount,uniqueCities } });
     } catch (e) {
       console.error("Error fetching forms:", e);
       return res.status(500).send({ data: "Something went wrong while fetching the form" });
@@ -1451,7 +1366,6 @@ const updateBooksStatus = async(req,res)=>{
 const bdmCampaignsIndia = async(req,res)=>{
   try {
 
-    console.log("uuuuyyyyyy")
     const isAdmin = req.user.name.toLowerCase().startsWith("admin");
 
     let query = {};
@@ -1468,44 +1382,22 @@ const bdmCampaignsIndia = async(req,res)=>{
 
     const forms = await Form.find(query)
       .select({
-        brandName: 1,
-        restaurantMobileNumber: 1,
-        firmName: 1,
-        contactPersonname: 1,
-        designation: 1,
-        contactPersonNumber: 1,
-        city: 1,
         leadStatus:1,
-        status:1,
-        adminId:1,
-        businessStatus:1
+        address:1
       });
 
-    const uniqueCitiesSet = new Set(forms.map(form => form.city));
-    const uniqueCities = Array.from(uniqueCitiesSet);
+      const uniqueCitiesSet = new Set();
 
-console.log(forms);
+      forms.forEach(form => {
+        form.address.forEach(address => {
+          uniqueCitiesSet.add(address.locationCity);
+        });
+      });
+      
+      const uniqueCities = Array.from(uniqueCitiesSet);
+      
+      return res.status(200).send({data:{forms,uniqueCities}});
 
-const newLeads = forms.filter(form => form.leadStatus === "new-lead");
-const opened = forms.filter(form => form.leadStatus === "connected" || form.leadStatus === "follow-up" || form.leadStatus === "not-connected");
-const followUp = forms.filter(form => form.leadStatus === "follow-up");
-const connected = forms.filter(form => form.leadStatus === "connected");
-const notConnected = forms.filter(form => form.leadStatus === "not-connected");
-
-const newLeadsCount = newLeads.length;
-const openedCount = opened.length;
-const followUpCount = followUp.length;
-const connectedCount = connected.length;
-const notConnectedCount = notConnected.length;
-
-console.log("New Leads Count:", newLeadsCount);
-console.log("Opened Count:", openedCount);
-console.log("Follow Up Count:", followUpCount);
-console.log("Connected Count:", connectedCount);
-console.log("Not Connected Count:", notConnectedCount);
-console.log("uniqueCities:",uniqueCities);
-
-    return res.status(200).send({ data: { newLeadsCount,openedCount,followUpCount,connectedCount,notConnectedCount,uniqueCities } });
   } catch (e) {
     console.error("Error fetching forms:", e);
     return res.status(500).send({ data: "Something went wrong while fetching the form" });
@@ -1533,48 +1425,21 @@ const bdmCampaignsBooks = async(req,res)=>{
 
     const forms = await Form.find(query)
     .select({
-      brandName: 1,
-      restaurantMobileNumber: 1,
-      firmName: 1,
-      contactPersonname: 1,
-      designation: 1,
-      contactPersonNumber: 1,
-      city: 1,
-      leadStatus:1,
-      status:1,
-      adminId:1,
-      booksBusinessStatus:1,
       booksLeadStatus:1,
-      billingSoftware:1
-
-
+      address:1
     });
 
-  const uniqueCitiesSet = new Set(forms.map(form => form.city));
-  const uniqueCities = Array.from(uniqueCitiesSet);
+    const uniqueCitiesSet = new Set();
 
-console.log(forms);
-
-const newLeads = forms.filter(form => form.leadStatus === "new-lead");
-const opened = forms.filter(form => form.leadStatus === "connected" || form.leadStatus === "follow-up" || form.leadStatus === "not-connected");
-const followUp = forms.filter(form => form.leadStatus === "follow-up");
-const connected = forms.filter(form => form.leadStatus === "connected");
-const notConnected = forms.filter(form => form.leadStatus === "not-connected");
-
-const newLeadsCount = newLeads.length;
-const openedCount = opened.length;
-const followUpCount = followUp.length;
-const connectedCount = connected.length;
-const notConnectedCount = notConnected.length;
-
-console.log("New Leads Count:", newLeadsCount);
-console.log("Opened Count:", openedCount);
-console.log("Follow Up Count:", followUpCount);
-console.log("Connected Count:", connectedCount);
-console.log("Not Connected Count:", notConnectedCount);
-console.log("uniqueCities:",uniqueCities);
-
-  return res.status(200).send({ data: { newLeadsCount,openedCount,followUpCount,connectedCount,notConnectedCount,uniqueCities } });
+    forms.forEach(form => {
+      form.address.forEach(address => {
+        uniqueCitiesSet.add(address.locationCity);
+      });
+    });
+    
+    const uniqueCities = Array.from(uniqueCitiesSet);
+    
+    return res.status(200).send({data:{forms,uniqueCities}});
   } catch (e) {
     console.error("Error fetching forms:", e);
     return res.status(500).send({ data: "Something went wrong while fetching the form" });
@@ -2011,6 +1876,106 @@ try {
 }
 
 
+const getPendingForm = async(req,res)=>{
+
+  try {
+    const {type} = req.params
+    const employeeId = req.user.userId
+
+    let query = {};
+
+
+    if(type==='india'){
+      console.log(type);
+      query = { 
+        employeeId: employeeId, 
+        businessStatus: "pending",
+        billingSoftware:"yes"  
+    }
+    }else{
+      console.log(type);
+      query = { 
+        employeeId: employeeId, 
+        booksBusinessStatus: "pending"  
+    }
+
+    } 
+
+    const result = await Form.find(query);
+    console.log(result)
+    return res.status(200).send({ data: result });
+  } catch (e) {
+    return res.status(500).send({ data: "Something went wrong while fetching the form" });
+  }
+
+}
+
+
+
+const getCompletedForm = async(req,res)=>{
+
+  try {
+    const {type} = req.params
+    const employeeId = req.user.userId
+
+    let query = {};
+
+
+    if(type==='india'){
+      console.log(type);
+      query = { 
+        employeeId: employeeId, 
+        businessStatus: "completed",
+        billingSoftware:"yes"  
+    }
+    }else{
+      console.log(type);
+      query = { 
+        employeeId: employeeId, 
+        booksBusinessStatus: "completed"  
+    }
+
+    } 
+
+    const result = await Form.find(query);
+    return res.status(200).send({ data: result });
+  } catch (e) {
+    return res.status(500).send({ data: "Something went wrong while fetching the form" });
+  }
+
+}
+
+
+
+
+const booksBusinessStatus = async(req,res)=>{
+  try {
+  
+    const {userId,newBusinessStatus,leadStatus} = req.body
+  
+    const data = await Form.updateMany(
+      { _id: userId },
+      {
+        $set: {
+          booksBusinessStatus: newBusinessStatus,
+          booksLeadStatus: leadStatus,
+        },
+      }
+    )
+    res.status(200).json({});
+  
+  ;
+    
+  
+  } catch (e) {
+    console.error("Error updating forms:", e);
+    return res.status(500).send({ data: "Something went wrong while updating the form" });
+  }
+  
+    }
+  
+
+
 
 module.exports={
   createForm,getForm,updateForm,getUsers,
@@ -2035,7 +2000,8 @@ module.exports={
   indiaFollowUpInBdm,indiaNewLeadsInBdm,indiaNotConnectedInBdm,
   booksNewLeadInBdm,booksFollowUpInBdm,booksConnectedInBdm,
   booksNotConnectedInBdm,addBdmFeature,updateBdmLocation,
-  uploadSelfiPhoto
+  uploadSelfiPhoto,getPendingForm,getCompletedForm,
+  booksBusinessStatus
 }
 
 

@@ -130,7 +130,7 @@ const addDetailsEmployeeSchema = mongoose.Schema({
     type:String,
     required: true
   },
-  adminId:{
+  adminId: {
     type:String,
     required: true
   },
@@ -157,11 +157,11 @@ callRecord:{
 },
 businessStatus:{
   type:String,
-  default:"pending"
+  default:"telemarketing"
 },
 booksBusinessStatus:{
   type:String,
-  default:"pending"
+  default:"telemarketing"
 },
 videoRecord:{
   type:Array
