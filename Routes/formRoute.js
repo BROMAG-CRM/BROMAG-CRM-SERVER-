@@ -21,7 +21,8 @@ bdmCampaignsBooks,bdmCampaignsIndia,indiaConnectedInBdm,
 indiaFollowUpInBdm,indiaNewLeadsInBdm,indiaNotConnectedInBdm,
 booksNewLeadInBdm,booksFollowUpInBdm,booksConnectedInBdm,
 booksNotConnectedInBdm,addBdmFeature,updateBdmLocation,
-uploadSelfiPhoto
+uploadSelfiPhoto,getPendingForm,getCompletedForm,
+booksBusinessStatus
 
 } = require("../controllers/formController");
 
@@ -98,6 +99,11 @@ router.post("/createform", createForm)
 
   .post("/updatebdmlocation/:id",updateBdmLocation)
   .post("/uploadselfiphoto/:id",upload.single('file'),uploadSelfiPhoto)
+
+  .get("/getpendingform/:type",getPendingForm)
+  .get("/getcompletedform/:type",getCompletedForm)
+
+  .post("/booksbusinessstatus",booksBusinessStatus)
 
   
 
