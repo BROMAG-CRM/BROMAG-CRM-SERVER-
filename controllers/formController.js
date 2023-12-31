@@ -1976,6 +1976,23 @@ const booksBusinessStatus = async(req,res)=>{
   
 
 
+  const updateStatus = async(req,res)=>{
+    try {
+      const {value,id} = req.body
+
+      const result = await Form.updateOne(
+        { _id: id },
+        { $set: { status: value } }
+      );;
+      return res.status(200).json({ data: result });
+    } catch (error) {
+      console.error("Error updating description:", error);
+      return res.status(500).send("Something went wrong while updating description");
+    }
+
+
+  }
+
 
 module.exports={
   createForm,getForm,updateForm,getUsers,
@@ -2001,7 +2018,7 @@ module.exports={
   booksNewLeadInBdm,booksFollowUpInBdm,booksConnectedInBdm,
   booksNotConnectedInBdm,addBdmFeature,updateBdmLocation,
   uploadSelfiPhoto,getPendingForm,getCompletedForm,
-  booksBusinessStatus
+  booksBusinessStatus,updateStatus
 }
 
 
