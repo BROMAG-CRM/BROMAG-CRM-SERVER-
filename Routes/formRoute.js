@@ -22,7 +22,7 @@ indiaFollowUpInBdm,indiaNewLeadsInBdm,indiaNotConnectedInBdm,
 booksNewLeadInBdm,booksFollowUpInBdm,booksConnectedInBdm,
 booksNotConnectedInBdm,addBdmFeature,updateBdmLocation,
 uploadSelfiPhoto,getPendingForm,getCompletedForm,
-booksBusinessStatus
+booksBusinessStatus,updateStatus
 
 } = require("../controllers/formController");
 
@@ -104,6 +104,8 @@ router.post("/createform", createForm)
   .get("/getcompletedform/:type",getCompletedForm)
 
   .post("/booksbusinessstatus",booksBusinessStatus)
+
+  .post("/updatestatus",updateStatus)
 
   
 
