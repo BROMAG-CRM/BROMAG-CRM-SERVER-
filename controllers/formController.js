@@ -1804,10 +1804,7 @@ const addBdmFeature = async (req, res) => {
 const updateBdmLocation=async(req,res)=>{
 
   const {location} = req.body
-  console.log(location)
-  console.log("locatoipmnnnnn")
   const { id } = req.params;
-  console.log(id)
   try {
     const result = await Form.updateOne(
       { _id: id },
