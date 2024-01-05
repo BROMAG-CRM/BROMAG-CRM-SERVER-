@@ -22,7 +22,9 @@ indiaFollowUpInBdm,indiaNewLeadsInBdm,indiaNotConnectedInBdm,
 booksNewLeadInBdm,booksFollowUpInBdm,booksConnectedInBdm,
 booksNotConnectedInBdm,addBdmFeature,updateBdmLocation,
 uploadSelfiPhoto,getPendingForm,getCompletedForm,
-booksBusinessStatus,updateStatus
+booksBusinessStatus,updateStatus,LegalManagementTasksIndia,
+uploadAgreement,updateLegalLocation,setLegalDate,
+legalCampaignsIndia,addLegalDescription
 
 } = require("../controllers/formController");
 
@@ -106,6 +108,13 @@ router.post("/createform", createForm)
   .post("/booksbusinessstatus",booksBusinessStatus)
 
   .post("/updatestatus",updateStatus)
+
+  .get("/legalmanagementtaskindia",LegalManagementTasksIndia)
+  .post("/uploadagreement/:id",upload.single('file'),uploadAgreement)
+  .post("/updatelegallocation/:id",updateLegalLocation)
+  .post("/setlegaldate",setLegalDate)
+  .get("/legalcampaignsindia",legalCampaignsIndia)
+  .post("/addlegaldescription",addLegalDescription)
 
   
 

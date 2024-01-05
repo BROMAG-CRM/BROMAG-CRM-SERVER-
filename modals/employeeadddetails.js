@@ -190,8 +190,107 @@ createdDate:{
   type:Date,
   default:Date.now
 },
+locationLegal: {
+  latitude: { type: Number },
+  longitude: { type: Number },
+  locationName: { type: String }
+},
+legalDate:{
+  type: String
+},
+agreement: {
+  location: {
+    type: {
+      latitude: { type: Number },
+      longitude: { type: Number },
+      locationName: { type: String }
+    }
+  },
+  description: { type: String },
+  followUpDate: { type: String },
+  document: { type: String }
+},
 
+ecs:{
+  location: {
+    type: {
+      latitude: { type: Number },
+      longitude: { type: Number },
+      locationName: { type: String }
+    }
+  },
+  description: { type: String },
+  followUpDate: { type: String },
+  document: { type: String }
+},
 
+legalSelfie: {
+  location: {
+    type: {
+      latitude: { type: Number },
+      longitude: { type: Number },
+      locationName: { type: String }
+    }
+  },
+  description: { type: String },
+  followUpDate: { type: String },
+  document: { type: String }
+},
+
+diningAgreement: {
+  location: {
+    type: {
+      latitude: { type: Number },
+      longitude: { type: Number },
+      locationName: { type: String }
+    }
+  },
+  description: { type: String },
+  followUpDate: { type: String },
+  document: { type: String }
+},
+
+additionalAgreement: {
+  location: {
+    type: {
+      latitude: { type: Number },
+      longitude: { type: Number },
+      locationName: { type: String }
+    }
+  },
+  description: { type: String },
+  followUpDate: { type: String },
+  document: { type: String }
+},
+
+whoWeAre: {
+  location: {
+    type: {
+      latitude: { type: Number },
+      longitude: { type: Number },
+      locationName: { type: String }
+    }
+  },
+  description: { type: String },
+  followUpDate: { type: String },
+  document: { type: String }
+},
+
+termsAndConditions: {
+  location: {
+    type: {
+      latitude: { type: Number },
+      longitude: { type: Number },
+      locationName: { type: String }
+    }
+  },
+  description: { type: String },
+  followUpDate: { type: String },
+  document: { type: String }
+},
+legalFollowUpDate:{
+  type:String
+}
 });
 
 module.exports = mongoose.model(
