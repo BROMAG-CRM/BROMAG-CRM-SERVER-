@@ -2135,6 +2135,8 @@ const LegalManagementTasksIndia = async (req, res) => {
     let query = {};
 
     if (isAdmin) {
+      console.log("admin");
+
       const adminId = req.user.userId;
       query = {
         adminId: adminId,
@@ -2142,7 +2144,10 @@ const LegalManagementTasksIndia = async (req, res) => {
         businessStatus: "legalmanagement",
       };
     } else {
+
+      console.log("kjjjfdhhsjfhsf");
       const userState = req.user.state;
+      console.log(userState)
       query = {
         state: userState,
         status: "Hot",
@@ -2165,7 +2170,11 @@ const LegalManagementTasksIndia = async (req, res) => {
       businessStatus: 1,
       legalFollowUpDate: 1,
       legalDescription: 1,
+      state: 1
     });
+    console.log("forms");
+
+    console.log(forms);
 
     return res.status(200).send({ data: forms });
   } catch (e) {
@@ -2177,37 +2186,51 @@ const LegalManagementTasksIndia = async (req, res) => {
 };
 
 const uploadAgreement = async (req, res) => {
-  const { originalname, buffer } = req.file;
+
   const { id } = req.params;
   const { fieldName, followUpDate, location, description } = req.body;
   const locationObject = JSON.parse(location);
+  let fileUrl = ""
 
-  const uniqueKey = (await generateRandomString(16)) + originalname;
+console.log("hiiiiuuuuuu");
 
-  const folderName = fieldName;
-  const key = `${folderName}/${uniqueKey}`;
-  const bucketName = process.env.BUCKET_NAME;
-
-  const s3Client = new S3Client({
-    region: process.env.REGION,
-    credentials: {
-      accessKeyId: process.env.ACCESS_KEYID,
-      secretAccessKey: process.env.SECRETACCESS_KEY,
-    },
-  });
 
   try {
-    const response = await s3Client.send(
-      new PutObjectCommand({
-        Bucket: bucketName,
-        Key: key,
-        Body: buffer,
-      })
-    );
-    const fileUrl = `https://${bucketName}.s3.ap-south-1.amazonaws.com/${key}`;
-    console.log("File uploaded successfully:", fileUrl);
 
 
+    if (req.file) {
+
+      console.log(req.file);
+      console.log("hujfhgkdngkdngf1234");
+      const folderName = fieldName;
+      const key = `${folderName}/${uniqueKey}`;
+      const bucketName = process.env.BUCKET_NAME;
+      const s3Client = new S3Client({
+        region: process.env.REGION,
+        credentials: {
+          accessKeyId: process.env.ACCESS_KEYID,
+          secretAccessKey: process.env.SECRETACCESS_KEY,
+        },
+      });
+
+      const { originalname, buffer } = req.file;
+      const uniqueKey = (await generateRandomString(16)) + originalname;
+
+      try {
+        const response = await s3Client.send(
+          new PutObjectCommand({
+            Bucket: bucketName,
+            Key: key,
+            Body: buffer,
+          })
+        );
+        fileUrl = `https://${bucketName}.s3.ap-south-1.amazonaws.com/${key}`;
+        console.log("File uploaded successfully:", fileUrl);
+      } catch (error) {
+        console.error("Error uploading file to S3:", error);
+        res.status(500).json({ error: "Failed to upload file" });
+      }
+    } 
 
     if (fieldName === "agreement") {
       try {
@@ -2327,7 +2350,7 @@ const uploadAgreement = async (req, res) => {
       }
     }
 
-    res.json({ fileUrl });
+    return res.status(200).json({});
   } catch (error) {
     console.error("Error uploading file to S3:", error);
     res.status(500).json({ error: "Failed to upload file" });
