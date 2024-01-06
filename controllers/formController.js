@@ -2242,6 +2242,7 @@ console.log("hiiiiuuuuuu");
           { $set: { agreement: agreement } },
           { new: true }
         );
+        return res.status(200).send({ data: result });
       } catch (error) {
         console.error("Error updating document:", error);
       }
@@ -2260,6 +2261,7 @@ console.log("hiiiiuuuuuu");
           { $set: { ecs: ecs } },
           { new: true }
         );
+        return res.status(200).send({ data: result });
       } catch (error) {
         console.error("Error updating document:", error);
       }
@@ -2277,6 +2279,7 @@ console.log("hiiiiuuuuuu");
           { $set: { legalSelfie: legalSelfie } },
           { new: true }
         );
+        return res.status(200).send({ data: result });
       } catch (error) {
         console.error("Error updating document:", error);
       }    }
@@ -2293,6 +2296,7 @@ console.log("hiiiiuuuuuu");
           { $set: { diningAgreement: diningAgreement } },
           { new: true }
         );
+        return res.status(200).send({ data: result });
       } catch (error) {
         console.error("Error updating document:", error);
       }    }
@@ -2309,6 +2313,7 @@ console.log("hiiiiuuuuuu");
           { $set: { additionalAgreement: additionalAgreement } },
           { new: true }
         );
+        return res.status(200).send({ data: result });
       } catch (error) {
         console.error("Error updating document:", error);
       }
@@ -2326,6 +2331,7 @@ console.log("hiiiiuuuuuu");
           { $set: { whoWeAre: whoWeAre } },
           { new: true }
         );
+        return res.status(200).send({ data: result });
       } catch (error) {
         console.error("Error updating document:", error);
       }    }
@@ -2342,6 +2348,7 @@ console.log("hiiiiuuuuuu");
           { $set: { termsAndConditions: termsAndConditions } },
           { new: true }
         );
+        return res.status(200).send({ data: result });
       } catch (error) {
         console.error("Error updating document:", error);
       }
