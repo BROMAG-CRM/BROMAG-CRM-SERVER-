@@ -2200,8 +2200,8 @@ console.log("hiiiiuuuuuu");
 
     if (req.file) {
 
-      console.log(req.file);
-      console.log("hujfhgkdngkdngf1234");
+      const { originalname, buffer } = req.file;
+      const uniqueKey = (await generateRandomString(16)) + originalname;
       const folderName = fieldName;
       const key = `${folderName}/${uniqueKey}`;
       const bucketName = process.env.BUCKET_NAME;
@@ -2212,9 +2212,6 @@ console.log("hiiiiuuuuuu");
           secretAccessKey: process.env.SECRETACCESS_KEY,
         },
       });
-
-      const { originalname, buffer } = req.file;
-      const uniqueKey = (await generateRandomString(16)) + originalname;
 
       try {
         const response = await s3Client.send(
