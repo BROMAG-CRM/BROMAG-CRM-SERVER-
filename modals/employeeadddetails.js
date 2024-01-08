@@ -190,14 +190,6 @@ createdDate:{
   type:Date,
   default:Date.now
 },
-locationLegal: {
-  latitude: { type: Number },
-  longitude: { type: Number },
-  locationName: { type: String }
-},
-legalDate:{
-  type: String
-},
 agreement: {
   location: {
     type: {
@@ -288,9 +280,75 @@ termsAndConditions: {
   followUpDate: { type: String },
   document: { type: String }
 },
-legalFollowUpDate:{
-  type:String
-}
+
+trademark: {
+  location: {
+    type: {
+      latitude: { type: Number },
+      longitude: { type: Number },
+      locationName: { type: String }
+    }
+  },
+  description: { type: String },
+  followUpDate: { type: String },
+  document: { type: String }
+},
+
+paymentGateway: {
+  location: {
+    type: {
+      latitude: { type: Number },
+      longitude: { type: Number },
+      locationName: { type: String }
+    }
+  },
+  description: { type: String },
+  followUpDate: { type: String },
+  document: { type: String }
+},
+
+dlt: {
+  location: {
+    type: {
+      latitude: { type: Number },
+      longitude: { type: Number },
+      locationName: { type: String }
+    }
+  },
+  description: { type: String },
+  followUpDate: { type: String },
+  document: { type: String }
+},
+
+otherCharges: {
+  location: {
+    type: {
+      latitude: { type: Number },
+      longitude: { type: Number },
+      locationName: { type: String }
+    }
+  },
+  description: { type: String },
+  followUpDate: { type: String },
+  document: { type: String }
+},
+
+paymentAcknowledgement: {
+  location: {
+    type: {
+      latitude: { type: Number },
+      longitude: { type: Number },
+      locationName: { type: String }
+    }
+  },
+  description: { type: String },
+  followUpDate: { type: String },
+  document: { type: String }
+},
+
+
+
+
 });
 
 module.exports = mongoose.model(

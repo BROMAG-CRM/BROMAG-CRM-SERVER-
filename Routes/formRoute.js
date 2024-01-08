@@ -23,8 +23,10 @@ booksNewLeadInBdm,booksFollowUpInBdm,booksConnectedInBdm,
 booksNotConnectedInBdm,addBdmFeature,updateBdmLocation,
 uploadSelfiPhoto,getPendingForm,getCompletedForm,
 booksBusinessStatus,updateStatus,LegalManagementTasksIndia,
-uploadAgreement,updateLegalLocation,setLegalDate,
-legalCampaignsIndia,addLegalDescription
+uploadAgreement,legalCampaignsIndia,legalCampaignsBooks,
+accountCampaignsBooks,accountCampaignsIndia,accountsTaskIndia,
+uploadAccountsAgreement
+
 
 } = require("../controllers/formController");
 
@@ -111,12 +113,16 @@ router.post("/createform", createForm)
 
   .get("/legalmanagementtaskindia",LegalManagementTasksIndia)
   .post("/uploadagreement/:id",upload.single('file'),uploadAgreement)
-  .post("/updatelegallocation/:id",updateLegalLocation)
-  .post("/setlegaldate",setLegalDate)
   .get("/legalcampaignsindia",legalCampaignsIndia)
-  .post("/addlegaldescription",addLegalDescription)
+  .get("/legalcampaignsbooks",legalCampaignsBooks)
 
   
+  .get("/accountstaskindia",accountsTaskIndia)
+  .post("/uploadaccountsagreement/:id",upload.single('file'),uploadAccountsAgreement)
+  .get("/accountcampaignsindia",accountCampaignsIndia)
+  .get("/accountcampaignsbooks",accountCampaignsBooks)
+
+
   
 
 module.exports = router;

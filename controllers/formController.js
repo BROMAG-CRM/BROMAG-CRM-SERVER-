@@ -2361,47 +2361,7 @@ console.log("hiiiiuuuuuu");
   }
 };
 
-const updateLegalLocation = async (req, res) => {
-  const { location } = req.body;
-  const { id } = req.params;
-  try {
-    const result = await Form.updateOne(
-      { _id: id },
-      {
-        $set: {
-          locationLegal: location,
-        },
-      }
-    );
 
-    return res.status(200).send({ data: result });
-  } catch (e) {
-    return res.status(500).send("Something went wrong while updating form");
-  }
-};
-
-const setLegalDate = async (req, res) => {
-  try {
-    const { selectedDate, id } = req.body;
-
-    console.log(req.body);
-
-    const result = await Form.updateOne(
-      { _id: id },
-      {
-        $set: {
-          legalDate: selectedDate,
-        },
-      }
-    );
-    return res.status(200).json({ data: result });
-  } catch (error) {
-    console.error("Error updating description:", error);
-    return res
-      .status(500)
-      .send("Something went wrong while updating description");
-  }
-};
 
 const legalCampaignsIndia = async (req, res) => {
   try {
@@ -2414,14 +2374,12 @@ const legalCampaignsIndia = async (req, res) => {
       const adminId = req.user.userId;
       query = {
         adminId: adminId,
-        billingSoftware: "yes",
         businessStatus: "legalmanagement",
       };
     } else {
       const userState = req.user.state;
       query = {
         state: userState,
-        billingSoftware: "yes",
         businessStatus: "legalmanagement",
       };
     }
@@ -2450,37 +2408,349 @@ const legalCampaignsIndia = async (req, res) => {
   }
 };
 
-const addLegalDescription = async (req, res) => {
+
+
+const legalCampaignsBooks = async(req,res)=>{
   try {
-    const { featureName, featureDescription, followUpDate, id } = req.body;
+    const isAdmin = req.user.name.toLowerCase().startsWith("admin");
 
-    console.log(req.body);
+    let query = {};
 
-    const updateObject = {
-      $push: {
-        legalDescription: {
-          featureName,
-          featureDescription,
-        },
-      },
-    };
-
-    if (followUpDate) {
-      updateObject.$set = {
-        legalFollowUpDate: followUpDate,
+    if (isAdmin) {
+      console.log(req.user);
+      const adminId = req.user.userId;
+      query = {
+        adminId: adminId,
+        businessStatus: "legalmanagement",
+        billingSoftware: "no"
+      };
+    } else {
+      const userState = req.user.state;
+      query = {
+        state: userState,
+        businessStatus: "legalmanagement",
+        billingSoftware: "no"
       };
     }
 
-    const result = await Form.updateOne({ _id: id }, updateObject);
+    const forms = await Form.find(query).select({
+      leadStatus: 1,
+      address: 1,
+    });
 
-    console.log(result);
+    const uniqueCitiesSet = new Set();
 
-    return res.status(200).json({ data: result });
-  } catch (error) {
-    console.error("Error updating feature:", error);
-    return res.status(500).send("Something went wrong while updating feature");
+    forms.forEach((form) => {
+      form.address.forEach((address) => {
+        uniqueCitiesSet.add(address.locationCity);
+      });
+    });
+
+    const uniqueCities = Array.from(uniqueCitiesSet);
+
+    return res.status(200).send({ data: { forms, uniqueCities } });
+  } catch (e) {
+    console.error("Error fetching forms:", e);
+    return res
+      .status(500)
+      .send({ data: "Something went wrong while fetching the form" });
+  }
+}
+
+
+
+
+
+const accountCampaignsIndia = async(req,res)=>{
+  try {
+    const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+
+    let query = {};
+
+    if (isAdmin) {
+      console.log(req.user);
+      const adminId = req.user.userId;
+      query = {
+        adminId: adminId,
+        businessStatus: "accountsmanagement",
+      };
+    } else {
+      const userState = req.user.state;
+      query = {
+        state: userState,
+        businessStatus: "accountsmanagement",
+      };
+    }
+
+    const forms = await Form.find(query).select({
+      leadStatus: 1,
+      address: 1,
+    });
+
+    const uniqueCitiesSet = new Set();
+
+    forms.forEach((form) => {
+      form.address.forEach((address) => {
+        uniqueCitiesSet.add(address.locationCity);
+      });
+    });
+
+    const uniqueCities = Array.from(uniqueCitiesSet);
+
+    return res.status(200).send({ data: { forms, uniqueCities } });
+  } catch (e) {
+    console.error("Error fetching forms:", e);
+    return res
+      .status(500)
+      .send({ data: "Something went wrong while fetching the form" });
+  }
+}
+
+
+
+
+const accountCampaignsBooks = async(req,res)=>{
+  try {
+    const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+
+    let query = {};
+
+    if (isAdmin) {
+      console.log(req.user);
+      const adminId = req.user.userId;
+      query = {
+        adminId: adminId,
+        businessStatus: "accountsmanagement",
+        billingSoftware: "no"
+      };
+    } else {
+      const userState = req.user.state;
+      query = {
+        state: userState,
+        businessStatus: "accountsmanagement",
+        billingSoftware: "no"
+      };
+    }
+
+    const forms = await Form.find(query).select({
+      leadStatus: 1,
+      address: 1,
+    });
+
+    const uniqueCitiesSet = new Set();
+
+    forms.forEach((form) => {
+      form.address.forEach((address) => {
+        uniqueCitiesSet.add(address.locationCity);
+      });
+    });
+
+    const uniqueCities = Array.from(uniqueCitiesSet);
+
+    return res.status(200).send({ data: { forms, uniqueCities } });
+  } catch (e) {
+    console.error("Error fetching forms:", e);
+    return res
+      .status(500)
+      .send({ data: "Something went wrong while fetching the form" });
+  }
+}
+
+
+
+const accountsTaskIndia = async (req, res) => {
+  try {
+    const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+    const userState = req.user.state;
+
+    let query = {};
+
+    if (isAdmin) {
+      console.log("admin");
+
+      const adminId = req.user.userId;
+      query = {
+        adminId: adminId,
+        status: "Hot",
+        businessStatus: "accountsmanagement",
+      };
+
+    } else {
+      query = {
+        state: userState,
+        status: "Hot",
+        businessStatus: "accountsmanagement",
+      };
+    }
+
+    const forms = await Form.find(query).select({
+      brandName: 1,
+      trademark: 1,
+      paymentGateway: 1,
+      dlt: 1,
+      otherCharges: 1,
+      paymentAcknowledgement: 1,
+
+    });
+
+    console.log(forms);
+
+    return res.status(200).send({ data: forms });
+  } catch (e) {
+    console.error("Error fetching forms:", e);
+    return res
+      .status(500)
+      .send({ data: "Something went wrong while fetching the form" });
   }
 };
+
+
+
+
+const uploadAccountsAgreement = async (req, res) => {
+
+  const { id } = req.params;
+  const { fieldName, followUpDate, location, description } = req.body;
+  const locationObject = JSON.parse(location);
+  let fileUrl = ""
+
+console.log("hiiiiuuuuuu");
+
+
+  try {
+
+
+    if (req.file) {
+
+      const { originalname, buffer } = req.file;
+      const uniqueKey = (await generateRandomString(16)) + originalname;
+      const folderName = fieldName;
+      const key = `${folderName}/${uniqueKey}`;
+      const bucketName = process.env.BUCKET_NAME;
+      const s3Client = new S3Client({
+        region: process.env.REGION,
+        credentials: {
+          accessKeyId: process.env.ACCESS_KEYID,
+          secretAccessKey: process.env.SECRETACCESS_KEY,
+        },
+      });
+
+      try {
+        const response = await s3Client.send(
+          new PutObjectCommand({
+            Bucket: bucketName,
+            Key: key,
+            Body: buffer,
+          })
+        );
+        fileUrl = `https://${bucketName}.s3.ap-south-1.amazonaws.com/${key}`;
+        console.log("File uploaded successfully:", fileUrl);
+      } catch (error) {
+        console.error("Error uploading file to S3:", error);
+        res.status(500).json({ error: "Failed to upload file" });
+      }
+    } 
+
+    if (fieldName === "trademark") {
+      try {
+        const trademark = {
+          location: locationObject,
+          description: description,
+          followUpDate: followUpDate,
+          document: fileUrl,
+        };
+        const result = await Form.findByIdAndUpdate(
+          id,
+          { $set: { trademark: trademark } },
+          { new: true }
+        );
+        return res.status(200).send({ data: result });
+      } catch (error) {
+        console.error("Error updating document:", error);
+      }
+    }
+
+    if (fieldName === "paymentGateway") {
+      try {
+        const paymentGateway = {
+          location: locationObject,
+          description: description,
+          followUpDate: followUpDate,
+          document: fileUrl,
+        };
+        const result = await Form.findByIdAndUpdate(
+          id,
+          { $set: { paymentGateway: paymentGateway } },
+          { new: true }
+        );
+        return res.status(200).send({ data: result });
+      } catch (error) {
+        console.error("Error updating document:", error);
+      }
+    }
+    if (fieldName === "dlt") {
+      try {
+        const dlt = {
+          location: locationObject,
+          description: description,
+          followUpDate: followUpDate,
+          document: fileUrl,
+        };
+        const result = await Form.findByIdAndUpdate(
+          id,
+          { $set: { dlt: dlt } },
+          { new: true }
+        );
+        return res.status(200).send({ data: result });
+      } catch (error) {
+        console.error("Error updating document:", error);
+      }    }
+    if (fieldName === "otherCharges") {
+      try {
+        const otherCharges = {
+          location: locationObject,
+          description: description,
+          followUpDate: followUpDate,
+          document: fileUrl,
+        };
+        const result = await Form.findByIdAndUpdate(
+          id,
+          { $set: { otherCharges: otherCharges } },
+          { new: true }
+        );
+        return res.status(200).send({ data: result });
+      } catch (error) {
+        console.error("Error updating document:", error);
+      }    }
+    if (fieldName === "paymentAcknowledgement") {
+      try {
+        const paymentAcknowledgement = {
+          location: locationObject,
+          description: description,
+          followUpDate: followUpDate,
+          document: fileUrl,
+        };
+        const result = await Form.findByIdAndUpdate(
+          id,
+          { $set: { paymentAcknowledgement: paymentAcknowledgement } },
+          { new: true }
+        );
+        return res.status(200).send({ data: result });
+      } catch (error) {
+        console.error("Error updating document:", error);
+      }
+    }
+    
+    return res.status(200).json({});
+  } catch (error) {
+    console.error("Error uploading file to S3:", error);
+    res.status(500).json({ error: "Failed to upload file" });
+  }
+};
+
+
+
+
 
 module.exports = {
   createForm,
@@ -2541,8 +2811,10 @@ module.exports = {
   updateStatus,
   LegalManagementTasksIndia,
   uploadAgreement,
-  updateLegalLocation,
-  setLegalDate,
   legalCampaignsIndia,
-  addLegalDescription,
+  legalCampaignsBooks,
+  accountCampaignsBooks,
+  accountCampaignsIndia,
+  accountsTaskIndia,
+  uploadAccountsAgreement
 };
