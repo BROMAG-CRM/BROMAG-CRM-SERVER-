@@ -352,7 +352,6 @@ const getFollowupLeadsDataIndia = async (req, res) => {
       callRecord: 1,
       features: 1,
     });
-    console.log(forms);
 
     return res.status(200).send({ data: forms });
   } catch (e) {
