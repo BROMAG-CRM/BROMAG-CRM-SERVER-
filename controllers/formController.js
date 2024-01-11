@@ -27,22 +27,22 @@ const getForm = async (req, res) => {
       query = {
         adminId: adminId,
         firmOption: category,
-        $or: [
-          { businessStatus: "telemarketing" },
-          { businessStatus: "telesales" },
-          { businessStatus: "bdm" },
-        ],
+        // $or: [
+        //   { businessStatus: "telemarketing" },
+        //   { businessStatus: "telesales" },
+        //   { businessStatus: "bdm" },
+        // ],
       };
     } else {
       const userState = req.user.state;
       query = {
         state: userState,
         firmOption: category,
-        $or: [
-          { businessStatus: "telemarketing" },
-          { businessStatus: "telesales" },
-          { businessStatus: "bdm" },
-        ],
+        // $or: [
+        //   { businessStatus: "telemarketing" },
+        //   { businessStatus: "telesales" },
+        //   { businessStatus: "bdm" },
+        // ],
       };
     }
 
@@ -54,6 +54,22 @@ const getForm = async (req, res) => {
       .send({ data: "Something went wrong while fetching the form" });
   }
 };
+
+
+const resetForm = async (req, res) => {
+
+  console.log(req.body);
+  console.log(req.params);
+
+  const { id } = req.params;
+  try {
+    const result = await Form.findByIdAndUpdate(id, { ...req.body });
+    return res.status(200).send({ data: result });
+  } catch (e) {
+    return res.status(500).send("Something went wrong while updating form");
+  }
+};
+
 
 const updateForm = async (req, res) => {
   const { id } = req.params;
@@ -1594,6 +1610,7 @@ const indiaConnectedInBdm = async (req, res) => {
       leadStatus: 1,
       bdmFeatures: 1,
       locationBdm: 1,
+      bdmSelfie: 1
     });
     console.log(forms);
 
@@ -1642,6 +1659,7 @@ const indiaFollowUpInBdm = async (req, res) => {
       followupDate: 1,
       bdmFeatures: 1,
       locationBdm: 1,
+      bdmSelfie: 1
     });
     console.log(forms);
 
@@ -1689,6 +1707,7 @@ const indiaNewLeadsInBdm = async (req, res) => {
       newLeadFeatures: 1,
       bdmFeatures: 1,
       locationBdm: 1,
+      bdmSelfie: 1
     });
     console.log(forms);
     console.log("forms");
@@ -2754,6 +2773,7 @@ console.log("hiiiiuuuuuu");
 module.exports = {
   createForm,
   getForm,
+  resetForm,
   updateForm,
   getUsers,
   updateUser,

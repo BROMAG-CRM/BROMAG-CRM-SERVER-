@@ -40,6 +40,9 @@ const addDetailsEmployeeSchema = mongoose.Schema({
   tablePhotos: {
     type: Array,
   },
+  menuPhotos: {
+    type: Array,
+  },
   billingSoftware: {
     type: String,
   },
