@@ -25,7 +25,7 @@ uploadSelfiPhoto,getPendingForm,getCompletedForm,
 booksBusinessStatus,updateStatus,LegalManagementTasksIndia,
 uploadAgreement,legalCampaignsIndia,legalCampaignsBooks,
 accountCampaignsBooks,accountCampaignsIndia,accountsTaskIndia,
-uploadAccountsAgreement,resetForm
+uploadAccountsAgreement,resetForm,getEditForm,getFormForEmployee
 
 
 } = require("../controllers/formController");
@@ -50,9 +50,11 @@ console.log("routeee");
 
 router.post("/createform", createForm)
   .get("/getform/:category", getForm)
-  .get("/getusers",getUsers)
+  .get("/getformforemployee", getFormForEmployee)
   .post("/resetform/:id",resetForm)
   .put("/updateform/:id", updateForm)
+  .get("/geteditform/:id", getEditForm)
+  .get("/getusers",getUsers)
   .post("/updateduser/:id",updateUser)
   .get("/getassignedindia",getAssignedIndia)
   .get("/getassignedbooks",getAssignedBooks)

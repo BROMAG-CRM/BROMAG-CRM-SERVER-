@@ -56,6 +56,38 @@ const getForm = async (req, res) => {
 };
 
 
+
+const getFormForEmployee = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const result = await Form.find({employeeId:userId});
+    return res.status(200).send({ data: result });
+  } catch (e) {
+    return res
+      .status(500)
+      .send({ data: "Something went wrong while fetching the form" });
+  }
+};
+
+
+
+
+const getEditForm = async (req, res) => {
+  try {
+    const {id} = req.params
+    const result = await Form.findOne({_id:id});
+    console.log(result);
+    console.log("result");
+    return res.status(200).send({ data: result });
+  } catch (e) {
+    return res
+      .status(500)
+      .send({ data: "Something went wrong while fetching the form" });
+  }
+};
+
+
+
 const resetForm = async (req, res) => {
 
   console.log(req.body);
@@ -72,6 +104,8 @@ const resetForm = async (req, res) => {
 
 
 const updateForm = async (req, res) => {
+
+  console.log("hiiiiiiiiii88");
   const { id } = req.params;
   try {
     const result = await Form.findByIdAndUpdate(id, { ...req.body });
@@ -2773,6 +2807,7 @@ console.log("hiiiiuuuuuu");
 module.exports = {
   createForm,
   getForm,
+  getEditForm,
   resetForm,
   updateForm,
   getUsers,
@@ -2835,5 +2870,6 @@ module.exports = {
   accountCampaignsBooks,
   accountCampaignsIndia,
   accountsTaskIndia,
-  uploadAccountsAgreement
+  uploadAccountsAgreement,
+  getFormForEmployee
 };

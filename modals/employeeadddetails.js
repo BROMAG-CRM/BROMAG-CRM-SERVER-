@@ -37,6 +37,9 @@ const addDetailsEmployeeSchema = mongoose.Schema({
   tableCount: {
     type: Array,
   },
+  socialMedia: {
+    type: Array
+  },
   tablePhotos: {
     type: Array,
   },
