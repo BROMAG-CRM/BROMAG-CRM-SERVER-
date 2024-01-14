@@ -1,71 +1,119 @@
-const Form=require("../modals/employeeadddetails")
-const Admin=require("../modals/adminUserModal")
-const { PutObjectCommand, S3Client } = require('@aws-sdk/client-s3');
-
+const Form = require("../modals/employeeadddetails");
+const Admin = require("../modals/adminUserModal");
+const { PutObjectCommand, S3Client } = require("@aws-sdk/client-s3");
 
 const createForm = async (req, res) => {
   try {
-    const result=await Form.create({...req.body})
-    console.log(result)
-    return res.status(200).send({data:result._id})
+    const result = await Form.create({ ...req.body });
+    console.log(result);
+    return res.status(200).send({ data: result._id });
   } catch (e) {
-    return res.status(200).send({data:"Something went wrong while creating the form"})
+    return res
+      .status(200)
+      .send({ data: "Something went wrong while creating the form" });
   }
 };
 
-
 const getForm = async (req, res) => {
   try {
-    const {category} = req.params
+    const { category } = req.params;
     console.log(category);
     const isAdmin = req.user.name.toLowerCase().startsWith("admin");
 
     let query = {};
 
     if (isAdmin) {
-      const adminId = req.user.userId
+      const adminId = req.user.userId;
       query = {
         adminId: adminId,
         firmOption: category,
-        $or: [
-          { businessStatus: "telemarketing" },
-          { businessStatus: "telesales" },
-          { businessStatus: "bdm" }
-        ]
+        // $or: [
+        //   { businessStatus: "telemarketing" },
+        //   { businessStatus: "telesales" },
+        //   { businessStatus: "bdm" },
+        // ],
       };
-          }
-
-    else {
-      const userState = req.user.state
-      query = { 
-        state:userState , 
+    } else {
+      const userState = req.user.state;
+      query = {
+        state: userState,
         firmOption: category,
-        $or: [
-          { businessStatus: "telemarketing" },
-          { businessStatus: "telesales" },
-          { businessStatus: "bdm" }
-        ]
-      }; 
+        // $or: [
+        //   { businessStatus: "telemarketing" },
+        //   { businessStatus: "telesales" },
+        //   { businessStatus: "bdm" },
+        // ],
+      };
     }
 
     const result = await Form.find(query);
     return res.status(200).send({ data: result });
   } catch (e) {
-    return res.status(500).send({ data: "Something went wrong while fetching the form" });
+    return res
+      .status(500)
+      .send({ data: "Something went wrong while fetching the form" });
   }
 };
 
 
-const updateForm=async(req,res)=>{
-    const { id } = req.params;
-    try {
-      const result = await Form.findByIdAndUpdate(id, { ...req.body });
-      return res.status(200).send({ data: result });
-    } catch (e) {
-      return res.status(500).send("Something went wrong while updating form");
-    }
-}
 
+const getFormForEmployee = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const result = await Form.find({employeeId:userId});
+    return res.status(200).send({ data: result });
+  } catch (e) {
+    return res
+      .status(500)
+      .send({ data: "Something went wrong while fetching the form" });
+  }
+};
+
+
+
+
+const getEditForm = async (req, res) => {
+  try {
+    const {id} = req.params
+    const result = await Form.findOne({_id:id});
+    console.log(result);
+    console.log("result");
+    return res.status(200).send({ data: result });
+  } catch (e) {
+    return res
+      .status(500)
+      .send({ data: "Something went wrong while fetching the form" });
+  }
+};
+
+
+
+const resetForm = async (req, res) => {
+
+  console.log(req.body);
+  console.log(req.params);
+
+  const { id } = req.params;
+  try {
+    const result = await Form.findByIdAndUpdate(id, { ...req.body });
+    return res.status(200).send({ data: result });
+  } catch (e) {
+    return res.status(500).send("Something went wrong while updating form");
+  }
+};
+
+
+const updateForm = async (req, res) => {
+
+  console.log("hiiiiiiiiii88");
+  const { id } = req.params;
+  try {
+    const result = await Form.findByIdAndUpdate(id, { ...req.body });
+    return res.status(200).send({ data: result });
+  } catch (e) {
+    return res.status(500).send("Something went wrong while updating form");
+  }
+};
 
 const getUsers = async (req, res) => {
   try {
@@ -84,16 +132,21 @@ const getUsers = async (req, res) => {
     console.log(result);
     return res.status(200).send({ data: result });
   } catch (e) {
-    return res.status(500).send({ data: "Something went wrong while fetching the form" });
+    return res
+      .status(500)
+      .send({ data: "Something went wrong while fetching the form" });
   }
 };
-
 
 const updateUser = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const result = await Admin.findByIdAndUpdate(id, { ...req.body }, { new: true });
+    const result = await Admin.findByIdAndUpdate(
+      id,
+      { ...req.body },
+      { new: true }
+    );
 
     if (!result) {
       return res.status(404).send("User not found");
@@ -127,7 +180,6 @@ const deleteUser = async (req, res) => {
   }
 };
 
-
 const getAssignedIndia = async (req, res) => {
   try {
     const isAdmin = req.user.name.toLowerCase().startsWith("admin");
@@ -136,39 +188,44 @@ const getAssignedIndia = async (req, res) => {
 
     if (isAdmin) {
       console.log(req.user);
-      const adminId = req.user.userId
-      query = { adminId: adminId, status: "Hot",businessStatus:"telemarketing" }; 
+      const adminId = req.user.userId;
+      query = {
+        adminId: adminId,
+        status: "Hot",
+        businessStatus: "telemarketing",
+      };
+    } else {
+      const userState = req.user.state;
+      query = {
+        state: userState,
+        status: "Hot",
+        businessStatus: "telemarketing",
+      };
     }
 
-    else {
-      const userState = req.user.state
-      query = { state:userState , status: "Hot",businessStatus:"telemarketing"}; 
-    }
+    const forms = await Form.find(query).select({
+      leadStatus: 1,
+      address: 1,
+    });
 
-    const forms = await Form.find(query)
-      .select({
-        leadStatus:1,
-        address:1
+    const uniqueCitiesSet = new Set();
+
+    forms.forEach((form) => {
+      form.address.forEach((address) => {
+        uniqueCitiesSet.add(address.locationCity);
       });
+    });
 
-const uniqueCitiesSet = new Set();
+    const uniqueCities = Array.from(uniqueCitiesSet);
 
-forms.forEach(form => {
-  form.address.forEach(address => {
-    uniqueCitiesSet.add(address.locationCity);
-  });
-});
-
-const uniqueCities = Array.from(uniqueCitiesSet);
-
-return res.status(200).send({data:{forms,uniqueCities}});
-
+    return res.status(200).send({ data: { forms, uniqueCities } });
   } catch (e) {
     console.error("Error fetching forms:", e);
-    return res.status(500).send({ data: "Something went wrong while fetching the form" });
+    return res
+      .status(500)
+      .send({ data: "Something went wrong while fetching the form" });
   }
 };
-
 
 const getAssignedBooks = async (req, res) => {
   try {
@@ -177,41 +234,45 @@ const getAssignedBooks = async (req, res) => {
     let query = {};
 
     if (isAdmin) {
-      const adminId = req.user.userId
-      query = { adminId: adminId, billingSoftware:"no", booksBusinessStatus:"telemarketing"}; 
+      const adminId = req.user.userId;
+      query = {
+        adminId: adminId,
+        billingSoftware: "no",
+        booksBusinessStatus: "telemarketing",
+      };
+    } else {
+      const userState = req.user.state;
+      query = {
+        state: userState,
+        billingSoftware: "no",
+        booksBusinessStatus: "telemarketing",
+      };
     }
 
-    else{
-      const userState = req.user.state
-      query = { state:userState , billingSoftware:"no", booksBusinessStatus:"telemarketing"}; 
-    }
-
-    const forms = await Form.find(query)
-    .select({
-      booksLeadStatus:1,
-      address:1
+    const forms = await Form.find(query).select({
+      booksLeadStatus: 1,
+      address: 1,
     });
-const uniqueCitiesSet = new Set();
+    const uniqueCitiesSet = new Set();
 
-forms.forEach(form => {
-  form.address.forEach(address => {
-    uniqueCitiesSet.add(address.locationCity);
-  });
-});
+    forms.forEach((form) => {
+      form.address.forEach((address) => {
+        uniqueCitiesSet.add(address.locationCity);
+      });
+    });
 
-const uniqueCities = Array.from(uniqueCitiesSet);
+    const uniqueCities = Array.from(uniqueCitiesSet);
 
-return res.status(200).send({data:{forms,uniqueCities}});
-
+    return res.status(200).send({ data: { forms, uniqueCities } });
   } catch (e) {
     console.error("Error fetching forms:", e);
-    return res.status(500).send({ data: "Something went wrong while fetching the form" });
+    return res
+      .status(500)
+      .send({ data: "Something went wrong while fetching the form" });
   }
 };
 
-
-
-const getNewLeadsDataIndia = async (req,res) => {
+const getNewLeadsDataIndia = async (req, res) => {
   console.log("1234567890");
   try {
     const isAdmin = req.user.name.toLowerCase().startsWith("admin");
@@ -220,116 +281,136 @@ const getNewLeadsDataIndia = async (req,res) => {
 
     if (isAdmin) {
       console.log("admn");
-      const adminId = req.user.userId
-      query = { adminId: adminId, status: "Hot", leadStatus:"new-lead",businessStatus:"telemarketing"}; 
-    }
-    else{
+      const adminId = req.user.userId;
+      query = {
+        adminId: adminId,
+        status: "Hot",
+        leadStatus: "new-lead",
+        businessStatus: "telemarketing",
+      };
+    } else {
       console.log("user");
-      const userState = req.user.state
+      const userState = req.user.state;
       console.log(userState);
-      query = { state:userState , status: "Hot", leadStatus:"new-lead",businessStatus:"telemarketing"}; 
+      query = {
+        state: userState,
+        status: "Hot",
+        leadStatus: "new-lead",
+        businessStatus: "telemarketing",
+      };
     }
 
-    const forms = await Form.find(query)
-      .select({
-        brandName: 1,
-        restaurantMobileNumber: 1,
-        firmName: 1,
-        contactPersonname: 1,
-        designation: 1,
-        contactPersonNumber: 1,
-        city: 1,
-        newLeadFeatures: 1,
-        businessStatus:1,
-        callRecord:1,
-        introduction:1
-      });
-      console.log(forms);
+    const forms = await Form.find(query).select({
+      brandName: 1,
+      restaurantMobileNumber: 1,
+      firmName: 1,
+      contactPersonname: 1,
+      designation: 1,
+      contactPersonNumber: 1,
+      city: 1,
+      newLeadFeatures: 1,
+      businessStatus: 1,
+      callRecord: 1,
+      introduction: 1,
+    });
+    console.log(forms);
 
-    return res.status(200).send({ data:  forms });
+    return res.status(200).send({ data: forms });
   } catch (e) {
     console.error("Error fetching forms:", e);
-    return res.status(500).send({ data: "Something went wrong while fetching the form" });
+    return res
+      .status(500)
+      .send({ data: "Something went wrong while fetching the form" });
   }
-}
+};
 
-const updateLeadStatus = async(req,res)=> {
+const updateLeadStatus = async (req, res) => {
   try {
-    const {value,id} = req.body
+    const { value, id } = req.body;
     const result = await Form.updateOne(
       { _id: id },
       { $set: { leadStatus: value } }
-    );;
+    );
     return res.status(200).json({ data: result });
   } catch (error) {
     console.error("Error updating description:", error);
-    return res.status(500).send("Something went wrong while updating description");
+    return res
+      .status(500)
+      .send("Something went wrong while updating description");
   }
-}
+};
 
-
-
-
-const followUpDetails =  async(req,res)=>{
+const followUpDetails = async (req, res) => {
   try {
-    const {time,date,id,value}= req.body
+    const { time, date, id, value } = req.body;
 
     console.log(req.body);
 
     const result = await Form.updateOne(
       { _id: id },
-      { $set: {
+      {
+        $set: {
           leadStatus: value,
           followupDate: date,
           followupTime: time,
-        }, }
-    );;
+        },
+      }
+    );
     return res.status(200).json({ data: result });
   } catch (error) {
     console.error("Error updating description:", error);
-    return res.status(500).send("Something went wrong while updating description");
+    return res
+      .status(500)
+      .send("Something went wrong while updating description");
   }
-}
+};
 
-
-const getFollowupLeadsDataIndia = async(req,res)=> {
+const getFollowupLeadsDataIndia = async (req, res) => {
   try {
     const isAdmin = req.user.name.toLowerCase().startsWith("admin");
 
     let query = {};
 
     if (isAdmin) {
-      const adminId = req.user.userId
-      query = { adminId: adminId, status: "Hot" ,leadStatus:"follow-up",businessStatus:"telemarketing"}; 
-    }
-    else{
-      const userState = req.user.state
-      query = { state:userState , status: "Hot" ,leadStatus:"follow-up",businessStatus:"telemarketing"}; 
+      const adminId = req.user.userId;
+      query = {
+        adminId: adminId,
+        status: "Hot",
+        leadStatus: "follow-up",
+        businessStatus: "telemarketing",
+      };
+    } else {
+      const userState = req.user.state;
+      query = {
+        state: userState,
+        status: "Hot",
+        leadStatus: "follow-up",
+        businessStatus: "telemarketing",
+      };
     }
 
-    const forms = await Form.find(query)
-      .select({
-        brandName: 1,
-        restaurantMobileNumber: 1,
-        firmName: 1,
-        contactPersonname: 1,
-        designation: 1,
-        contactPersonNumber: 1,
-        city: 1,
-        followupTime: 1,
-        followupDate: 1,
-        callRecord: 1,
-        features: 1
-      });
-      console.log(forms);
+    const forms = await Form.find(query).select({
+      brandName: 1,
+      restaurantMobileNumber: 1,
+      firmName: 1,
+      contactPersonname: 1,
+      designation: 1,
+      contactPersonNumber: 1,
+      city: 1,
+      followupTime: 1,
+      followupDate: 1,
+      callRecord: 1,
+      features: 1,
+    });
 
-    return res.status(200).send({ data:  forms });
+    return res.status(200).send({ data: forms });
   } catch (e) {
     console.error("Error fetching forms:", e);
-    return res.status(500).send({ data: "Something went wrong while fetching the form" });
+    return res
+      .status(500)
+      .send({ data: "Something went wrong while fetching the form" });
   }
-}
-
+};
 
 const addFeature = async (req, res) => {
   try {
@@ -340,13 +421,13 @@ const addFeature = async (req, res) => {
       { _id: id },
       {
         $push: {
-          features: {featureName, featureDescription}
+          features: { featureName, featureDescription },
         },
       }
     );
 
-   console.log(result);
-  
+    console.log(result);
+
     return res.status(200).json({ data: result });
   } catch (error) {
     console.error("Error updating feature:", error);
@@ -354,140 +435,142 @@ const addFeature = async (req, res) => {
   }
 };
 
-
-
-const getConnectedLeadsDataIndia = async (req,res)=> {
-
-
-
+const getConnectedLeadsDataIndia = async (req, res) => {
   try {
     const isAdmin = req.user.name.toLowerCase().startsWith("admin");
 
     let query = {};
 
     if (isAdmin) {
-      const adminId = req.user.userId
-      query = { adminId: adminId, status: "Hot", leadStatus:"connected",businessStatus:"telemarketing"}; 
-    }
-    else{
-      const userState = req.user.state
-      query = { state:userState , status: "Hot", leadStatus:"connected",businessStatus:"telemarketing"}; 
+      const adminId = req.user.userId;
+      query = {
+        adminId: adminId,
+        status: "Hot",
+        leadStatus: "connected",
+        businessStatus: "telemarketing",
+      };
+    } else {
+      const userState = req.user.state;
+      query = {
+        state: userState,
+        status: "Hot",
+        leadStatus: "connected",
+        businessStatus: "telemarketing",
+      };
     }
 
-    const forms = await Form.find(query)
-      .select({
-        brandName: 1,
-        restaurantMobileNumber: 1,
-        firmName: 1,
-        contactPersonname: 1,
-        designation: 1,
-        contactPersonNumber: 1,
-        city: 1,
-        leadDescription: 1,
-        callRecord:1,
-        features:1,
-        status: 1,
-        leadStatus: 1,        
-      });
-      console.log(forms);
+    const forms = await Form.find(query).select({
+      brandName: 1,
+      restaurantMobileNumber: 1,
+      firmName: 1,
+      contactPersonname: 1,
+      designation: 1,
+      contactPersonNumber: 1,
+      city: 1,
+      leadDescription: 1,
+      callRecord: 1,
+      features: 1,
+      status: 1,
+      leadStatus: 1,
+    });
+    console.log(forms);
 
-    return res.status(200).send({ data:  forms });
+    return res.status(200).send({ data: forms });
   } catch (e) {
     console.error("Error fetching forms:", e);
-    return res.status(500).send({ data: "Something went wrong while fetching the form" });
+    return res
+      .status(500)
+      .send({ data: "Something went wrong while fetching the form" });
   }
+};
 
-}
-
-
-
-
-const getNotConnectedLeadsDataIndia = async (req,res)=> {
-
+const getNotConnectedLeadsDataIndia = async (req, res) => {
   try {
     const isAdmin = req.user.name.toLowerCase().startsWith("admin");
 
     let query = {};
 
     if (isAdmin) {
-      const adminId = req.user.userId
-      query = { adminId: adminId, status: "Hot", leadStatus:"not-connected" ,businessStatus:"telemarketing"}; 
-    }
-    else{
-      const userState = req.user.state
-      query = { state:userState , status: "Hot", leadStatus:"not-connected",businessStatus:"telemarketing"}; 
+      const adminId = req.user.userId;
+      query = {
+        adminId: adminId,
+        status: "Hot",
+        leadStatus: "not-connected",
+        businessStatus: "telemarketing",
+      };
+    } else {
+      const userState = req.user.state;
+      query = {
+        state: userState,
+        status: "Hot",
+        leadStatus: "not-connected",
+        businessStatus: "telemarketing",
+      };
     }
 
-    const forms = await Form.find(query)
-      .select({
-        brandName: 1,
-        restaurantMobileNumber: 1,
-        firmName: 1,
-        contactPersonname: 1,
-        designation: 1,
-        contactPersonNumber: 1,
-        city: 1,
-        leadDescription: 1,
-      });
-      console.log(forms);
+    const forms = await Form.find(query).select({
+      brandName: 1,
+      restaurantMobileNumber: 1,
+      firmName: 1,
+      contactPersonname: 1,
+      designation: 1,
+      contactPersonNumber: 1,
+      city: 1,
+      leadDescription: 1,
+    });
+    console.log(forms);
 
-    return res.status(200).send({ data:  forms });
+    return res.status(200).send({ data: forms });
   } catch (e) {
     console.error("Error fetching forms:", e);
-    return res.status(500).send({ data: "Something went wrong while fetching the form" });
+    return res
+      .status(500)
+      .send({ data: "Something went wrong while fetching the form" });
   }
+};
 
-}
-
-
-
-
-const progressLeadsData = async (req,res)=> {
+const progressLeadsData = async (req, res) => {
   try {
     const isAdmin = req.user.name.toLowerCase().startsWith("admin");
 
     let query = {};
 
     if (isAdmin) {
-      const adminId = req.user.userId
-      query = { adminId: adminId, status: "Hot",businessStatus:"telesales" }; 
+      const adminId = req.user.userId;
+      query = { adminId: adminId, status: "Hot", businessStatus: "telesales" };
+    } else {
+      const userState = req.user.state;
+      query = { state: userState, status: "Hot", businessStatus: "telesales" };
     }
-    else{
-      const userState = req.user.state
-      query = { state:userState ,status: "Hot",businessStatus:"telesales" }; 
-    }
 
-    const forms = await Form.find(query)
-      .select({
-        brandName: 1,
-        restaurantMobileNumber: 1,
-        firmName: 1,
-        contactPersonname: 1,
-        designation: 1,
-        contactPersonNumber: 1,
-        city: 1,
-        leadDescription: 1,
-        videoFeatures: 1,
-        videoRecord: 1
-      });
+    const forms = await Form.find(query).select({
+      brandName: 1,
+      restaurantMobileNumber: 1,
+      firmName: 1,
+      contactPersonname: 1,
+      designation: 1,
+      contactPersonNumber: 1,
+      city: 1,
+      leadDescription: 1,
+      videoFeatures: 1,
+      videoRecord: 1,
+    });
 
-      console.log(forms);
-      console.log("hiiiii");
- 
+    console.log(forms);
+    console.log("hiiiii");
 
-
-    return res.status(200).send({ data:  forms });
+    return res.status(200).send({ data: forms });
   } catch (e) {
     console.error("Error fetching forms:", e);
-    return res.status(500).send({ data: "Something went wrong while fetching the form" });
+    return res
+      .status(500)
+      .send({ data: "Something went wrong while fetching the form" });
   }
-}
-
-
+};
 
 async function generateRandomString(length) {
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-  let result = '';
+  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+  let result = "";
   const charactersLength = characters.length;
   for (let i = 0; i < length; i++) {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
@@ -495,20 +578,16 @@ async function generateRandomString(length) {
   return result;
 }
 
-
-
 const uploadCallRecord = async (req, res) => {
-
   const { id } = req.params;
   const { originalname, buffer } = req.file;
 
   const uniqueKey = (await generateRandomString(16)) + originalname;
   console.log(uniqueKey);
 
-  const folderName = 'callRecords'; 
+  const folderName = "callRecords";
   const key = `${folderName}/${uniqueKey}`;
   const bucketName = process.env.BUCKET_NAME;
-
 
   const s3Client = new S3Client({
     region: process.env.REGION,
@@ -517,7 +596,7 @@ const uploadCallRecord = async (req, res) => {
       secretAccessKey: process.env.SECRETACCESS_KEY,
     },
   });
-  
+
   try {
     const response = await s3Client.send(
       new PutObjectCommand({
@@ -530,824 +609,904 @@ const uploadCallRecord = async (req, res) => {
     const fileUrl = `https://${bucketName}.s3.ap-south-1.amazonaws.com/${key}`;
     console.log("File uploaded successfully:", fileUrl);
 
-    await Form.updateOne(
-      { _id: id },
-      { $push: { callRecord: fileUrl} }
-    )
+    await Form.updateOne({ _id: id }, { $push: { callRecord: fileUrl } });
 
     // Optionally, you can send the file URL as a response to the client
     res.json({ fileUrl });
-
   } catch (error) {
     console.error("Error uploading file to S3:", error);
-    res.status(500).json({ error: 'Failed to upload file' });
+    res.status(500).json({ error: "Failed to upload file" });
   }
 };
 
+const uploadImage = async (req, res) => {
+  const { originalname, buffer } = req.file;
+  const { fieldName } = req.params;
 
-const uploadImage = async(req,res)=>{
-  
-    const { originalname, buffer } = req.file;
-    const {fieldName} = req.params
-  
-    const uniqueKey = (await generateRandomString(16)) + originalname;
+  const uniqueKey = (await generateRandomString(16)) + originalname;
 
-    const folderName = fieldName; 
-    const key = `${folderName}/${uniqueKey}`;
-    const bucketName = process.env.BUCKET_NAME;
+  const folderName = fieldName;
+  const key = `${folderName}/${uniqueKey}`;
+  const bucketName = process.env.BUCKET_NAME;
 
-  
-    const s3Client = new S3Client({
-      region: process.env.REGION,
-      credentials: {
-        accessKeyId: process.env.ACCESS_KEYID,      
-        secretAccessKey: process.env.SECRETACCESS_KEY,
-      },
-    });
-    
-    try {
-      const response = await s3Client.send(
-        new PutObjectCommand({
-          Bucket: bucketName,
-          Key: key,
-          Body: buffer,
-        })
-      );
-      const fileUrl = `https://${bucketName}.s3.ap-south-1.amazonaws.com/${key}`;
-      console.log("File uploaded successfully:", fileUrl);
-  
-      res.json({ fileUrl });
-    } catch (error) {
-      console.error("Error uploading file to S3:", error);
-      res.status(500).json({ error: 'Failed to upload file' });
-    }
-  };
+  const s3Client = new S3Client({
+    region: process.env.REGION,
+    credentials: {
+      accessKeyId: process.env.ACCESS_KEYID,
+      secretAccessKey: process.env.SECRETACCESS_KEY,
+    },
+  });
 
+  try {
+    const response = await s3Client.send(
+      new PutObjectCommand({
+        Bucket: bucketName,
+        Key: key,
+        Body: buffer,
+      })
+    );
+    const fileUrl = `https://${bucketName}.s3.ap-south-1.amazonaws.com/${key}`;
+    console.log("File uploaded successfully:", fileUrl);
 
-
-  const uploadVideoRecord = async(req,res)=> {
-
-
-    const { id } = req.params;
-    const { originalname, buffer } = req.file;
-
-    const uniqueKey = (await generateRandomString(16)) + originalname;
-    console.log(uniqueKey);
-
-    const folderName = 'videoRecords'; 
-    const key = `${folderName}/${uniqueKey}`;
-    const bucketName = process.env.BUCKET_NAME;
-
-  
-    const s3Client = new S3Client({
-      region: process.env.REGION,
-      credentials: {
-        accessKeyId: process.env.ACCESS_KEYID,
-        secretAccessKey: process.env.SECRETACCESS_KEY,
-      },
-    });
-    
-    try {
-      const response = await s3Client.send(
-        new PutObjectCommand({
-          Bucket: bucketName,
-          Key: key,
-          Body: buffer,
-        })
-      );
-      // Log the URL of the uploaded file
-      const fileUrl = `https://${bucketName}.s3.ap-south-1.amazonaws.com/${key}`;
-      console.log("File uploaded successfully:", fileUrl);
-  
-      await Form.updateOne(
-        { _id: id },
-        { $push: { videoRecord: fileUrl} }
-      )
-  
-      // Optionally, you can send the file URL as a response to the client
-      res.json({ fileUrl });
-  
-    } catch (error) {
-      console.error("Error uploading file to S3:", error);
-      res.status(500).json({ error: 'Failed to upload file' });
-    }
-
+    res.json({ fileUrl });
+  } catch (error) {
+    console.error("Error uploading file to S3:", error);
+    res.status(500).json({ error: "Failed to upload file" });
   }
+};
 
+const uploadVideoRecord = async (req, res) => {
+  const { id } = req.params;
+  const { originalname, buffer } = req.file;
 
+  const uniqueKey = (await generateRandomString(16)) + originalname;
+  console.log(uniqueKey);
 
-  const myLeadsBooks = async(req,res)=>{
-    try {
-      const isAdmin = req.user.name.toLowerCase().startsWith("admin");
-  
-      let query = {};
-  
-      if (isAdmin) {
-        const adminId = req.user.userId
-        query = { adminId: adminId , billingSoftware:"no"}; 
-      }
-      else{
-        const userState = req.user.state
-        query = { state:userState , billingSoftware:"no"}; 
-      }
-      const forms = await Form.find(query)
-        .select({
-          brandName: 1,
-          restaurantMobileNumber: 1,
-          firmName: 1,
-          contactPersonname: 1,
-          designation: 1,
-          contactPersonNumber: 1,
-          city: 1,
-        });
-        console.log(forms);
-  
-      return res.status(200).send({ data:  forms });
-    } catch (e) {
-      console.error("Error fetching forms:", e);
-      return res.status(500).send({ data: "Something went wrong while fetching the form" });
-    }
+  const folderName = "videoRecords";
+  const key = `${folderName}/${uniqueKey}`;
+  const bucketName = process.env.BUCKET_NAME;
+
+  const s3Client = new S3Client({
+    region: process.env.REGION,
+    credentials: {
+      accessKeyId: process.env.ACCESS_KEYID,
+      secretAccessKey: process.env.SECRETACCESS_KEY,
+    },
+  });
+
+  try {
+    const response = await s3Client.send(
+      new PutObjectCommand({
+        Bucket: bucketName,
+        Key: key,
+        Body: buffer,
+      })
+    );
+    // Log the URL of the uploaded file
+    const fileUrl = `https://${bucketName}.s3.ap-south-1.amazonaws.com/${key}`;
+    console.log("File uploaded successfully:", fileUrl);
+
+    await Form.updateOne({ _id: id }, { $push: { videoRecord: fileUrl } });
+
+    // Optionally, you can send the file URL as a response to the client
+    res.json({ fileUrl });
+  } catch (error) {
+    console.error("Error uploading file to S3:", error);
+    res.status(500).json({ error: "Failed to upload file" });
   }
+};
 
-
-  const businessStatus = async(req,res)=>{
-try {
-
-  const {userId,newBusinessStatus,leadStatus} = req.body
-
-  const data = await Form.updateMany(
-    { _id: userId },
-    {
-      $set: {
-        businessStatus: newBusinessStatus,
-        leadStatus: leadStatus,
-      },
-    }
-  )
-  res.status(200).json({});
-
-;
-  
-
-} catch (e) {
-  console.error("Error updating forms:", e);
-  return res.status(500).send({ data: "Something went wrong while updating the form" });
-}
-
-  }
-
-
-
-  const addVideoFeature = async (req, res) => {
-    try {
-      const { featureName, featureDescription, id } = req.body;
-  
-      const result = await Form.updateOne(
-        { _id: id },
-        {
-          $push: {
-            videoFeatures: {featureName, featureDescription}
-          },
-        }
-      );
-      
-      return res.status(200).json({ data: result });
-    } catch (error) {
-      console.error("Error updating feature:", error);
-      return res.status(500).send("Something went wrong while updating feature");
-    }
-  };
-
-
-  const addIntroduction = async (req, res) => {
-    try {
-      const { featureName, featureDescription, id } = req.body;
-      console.log(req.body);
-  
-      const result = await Form.updateOne(
-        { _id: id },
-        {
-          $push: {
-            introduction: {featureName, featureDescription}
-          },
-        }
-      );
-  
-     console.log(result);
-    
-      return res.status(200).json({ data: result });
-    } catch (error) {
-      console.error("Error updating feature:", error);
-      return res.status(500).send("Something went wrong while updating feature");
-    }
-  };
-  
-
-  const salesBooks = async(req,res)=>{
-
-      try {
-        const isAdmin = req.user.name.toLowerCase().startsWith("admin");
-    
-        let query = {};
-    
-        if (isAdmin) {
-          const adminId = req.user.userId
-          query = { adminId: adminId , billingSoftware:"no" ,businessStatus:"telesales"}; 
-        }
-        else{
-          const userState = req.user.state
-          query = { state:userState , billingSoftware:"no" ,businessStatus:"telesales"}; 
-        }
-        const forms = await Form.find(query)
-          .select({
-            brandName: 1,
-            restaurantMobileNumber: 1,
-            firmName: 1,
-            contactPersonname: 1,
-            designation: 1,
-            contactPersonNumber: 1,
-            city: 1,
-          });
-          console.log(forms);
-    
-        return res.status(200).send({ data:  forms });
-      } catch (e) {
-        console.error("Error fetching forms:", e);
-        return res.status(500).send({ data: "Something went wrong while fetching the form" });
-      }
-
-  }
-
-  const SalesCampaignsIndia = async(req,res)=>{
-    try {
-      const isAdmin = req.user.name.toLowerCase().startsWith("admin");
-  
-      let query = {};
-  
-      if (isAdmin) {
-        console.log(req.user);
-        const adminId = req.user.userId
-        query = { adminId: adminId, businessStatus:"telesales" }; 
-      }
-      else{
-        const userState = req.user.state
-        query = { state:userState ,businessStatus:"telesales"}; 
-      }
-  
-      const forms = await Form.find(query)
-        .select({
-          leadStatus:1,
-          address:1
-        });
-  
-        const uniqueCitiesSet = new Set();
-
-        forms.forEach(form => {
-          form.address.forEach(address => {
-            uniqueCitiesSet.add(address.locationCity);
-          });
-        });
-        
-        const uniqueCities = Array.from(uniqueCitiesSet);
-        
-        return res.status(200).send({data:{forms,uniqueCities}});
-  
-    } catch (e) {
-      console.error("Error fetching forms:", e);
-      return res.status(500).send({ data: "Something went wrong while fetching the form" });
-    }
-  }
-
-  const SalesCampaignsBooks = async(req,res)=>{
-    try {
-      const isAdmin = req.user.name.toLowerCase().startsWith("admin");
-  
-      let query = {};
-  
-      if (isAdmin) {
-        console.log(req.user);
-        const adminId = req.user.userId
-        query = { adminId: adminId, billingSoftware:"no",booksBusinessStatus:"telesales"}; 
-      }
-      else{
-        const userState = req.user.state
-        query = { state:userState , billingSoftware:"no",booksBusinessStatus:"telesales"}; 
-      }
-  
-      const forms = await Form.find(query)
-      .select({
-        booksLeadStatus:1,
-        address:1
-      });
-  
-      const uniqueCitiesSet = new Set();
-
-      forms.forEach(form => {
-        form.address.forEach(address => {
-          uniqueCitiesSet.add(address.locationCity);
-        });
-      });
-      
-      const uniqueCities = Array.from(uniqueCitiesSet);
-      
-      return res.status(200).send({data:{forms,uniqueCities}});
-  
-    } catch (e) {
-      console.error("Error fetching forms:", e);
-      return res.status(500).send({ data: "Something went wrong while fetching the form" });
-    }
-
-  }
-
-
-  const booksConnectedInMarkrting = async(req,res)=> {
-
-    try {
-      const isAdmin = req.user.name.toLowerCase().startsWith("admin");
-  
-      let query = {};
-  
-      if (isAdmin) {
-        const adminId = req.user.userId
-        query = { adminId: adminId, status: "Hot", booksLeadStatus:"connected",booksBusinessStatus:"telemarketing" ,billingSoftware:"no"}; 
-      }
-      else{
-        const userState = req.user.state
-        query = { state:userState ,status: "Hot", booksLeadStatus:"connected",booksBusinessStatus:"telemarketing" ,billingSoftware:"no"}; 
-      }
-  
-      const forms = await Form.find(query)
-        .select({
-          brandName: 1,
-          restaurantMobileNumber: 1,
-          firmName: 1,
-          contactPersonname: 1,
-          designation: 1,
-          contactPersonNumber: 1,
-          city: 1,
-          leadDescription: 1,
-          callRecord:1,
-          features:1,
-          status: 1,
-          leadStatus: 1,        
-        });
-        console.log(forms);
-  
-      return res.status(200).send({ data:  forms });
-    } catch (e) {
-      console.error("Error fetching forms:", e);
-      return res.status(500).send({ data: "Something went wrong while fetching the form" });
-    }
-
-  }
-
-  const booksFollowUpInMarkrting = async(req,res)=> {
-
-    try {
-      const isAdmin = req.user.name.toLowerCase().startsWith("admin");
-  
-      let query = {};
-  
-      if (isAdmin) {
-        const adminId = req.user.userId
-        query = { adminId: adminId, status: "Hot" ,booksLeadStatus:"follow-up",booksBusinessStatus:"telemarketing" ,billingSoftware:"no"}; 
-      }
-      else{
-        const userState = req.user.state
-        query = { state:userState ,status: "Hot" ,booksLeadStatus:"follow-up",booksBusinessStatus:"telemarketing" ,billingSoftware:"no"}; 
-      }
-  
-      const forms = await Form.find(query)
-        .select({
-          brandName: 1,
-          restaurantMobileNumber: 1,
-          firmName: 1,
-          contactPersonname: 1,
-          designation: 1,
-          contactPersonNumber: 1,
-          city: 1,
-          leadDescription: 1,
-          followupTime: 1,
-          followupDate: 1,
-          callRecord: 1
-        });
-        console.log(forms);
-  
-      return res.status(200).send({ data:  forms });
-    } catch (e) {
-      console.error("Error fetching forms:", e);
-      return res.status(500).send({ data: "Something went wrong while fetching the form" });
-    }
-
-  }
-
-
-  const booksNewLeadInMarkrting = async(req,res)=>{
-    try {
-      const isAdmin = req.user.name.toLowerCase().startsWith("admin");
-  
-      let query = {};
-  
-      if (isAdmin) {
-        const adminId = req.user.userId
-        query = { adminId: adminId, status: "Hot", booksLeadStatus:"new-lead",booksBusinessStatus:"telemarketing" ,billingSoftware:"no"}; 
-      }
-      else{
-        const userState = req.user.state
-        query = { state:userState ,status: "Hot", booksLeadStatus:"new-lead",booksBusinessStatus:"telemarketing" ,billingSoftware:"no"}; 
-      }
-      const forms = await Form.find(query)
-        .select({
-          brandName: 1,
-          restaurantMobileNumber: 1,
-          firmName: 1,
-          contactPersonname: 1,
-          designation: 1,
-          contactPersonNumber: 1,
-          city: 1,
-          newLeadFeatures: 1,
-          businessStatus:1
-        });
-        console.log(forms);
-
-      return res.status(200).send({ data:  forms });
-    } catch (e) {
-      console.error("Error fetching forms:", e);
-      return res.status(500).send({ data: "Something went wrong while fetching the form" });
-    }
-  }
-
-
-  const booksNotConnectedInMarkrting = async(req,res)=>{
-
-    try {
-      const isAdmin = req.user.name.toLowerCase().startsWith("admin");
-  
-      let query = {};
-  
-      if (isAdmin) {
-        const adminId = req.user.userId
-        query = { adminId: adminId, status: "Hot", booksLeadStatus:"not-connected" ,booksBusinessStatus:"telemarketing",billingSoftware:"no"}; 
-      }
-      else{
-        const userState = req.user.state
-        query = { state:userState , status: "Hot", booksLeadStatus:"not-connected" ,booksBusinessStatus:"telemarketing",billingSoftware:"no"}; 
-      }
-  
-      const forms = await Form.find(query)
-        .select({
-          brandName: 1,
-          restaurantMobileNumber: 1,
-          firmName: 1,
-          contactPersonname: 1,
-          designation: 1,
-          contactPersonNumber: 1,
-          city: 1,
-          leadDescription: 1,
-        });
-        console.log(forms);
-  
-      return res.status(200).send({ data:  forms });
-    } catch (e) {
-      console.error("Error fetching forms:", e);
-      return res.status(500).send({ data: "Something went wrong while fetching the form" });
-    }
-  
-
-  }
-
-  const indiaConnectedInSales = async(req,res)=>{
-    try {
-      const isAdmin = req.user.name.toLowerCase().startsWith("admin");
-  
-      let query = {};
-  
-      if (isAdmin) {
-        const adminId = req.user.userId
-        query = { adminId: adminId, status: "Hot", leadStatus:"connected",businessStatus:"telesales"}; 
-      }
-      else{
-        const userState = req.user.state
-        query = { state:userState , status: "Hot", leadStatus:"connected",businessStatus:"telesales"}; 
-      }
-  
-      const forms = await Form.find(query)
-        .select({
-          brandName: 1,
-          restaurantMobileNumber: 1,
-          firmName: 1,
-          contactPersonname: 1,
-          designation: 1,
-          contactPersonNumber: 1,
-          city: 1,
-          leadDescription: 1,
-          videoRecord: 1,
-          status: 1,
-          leadStatus: 1,
-          videoFeatures:1,
-          businessStatus:1        
-        });
-        console.log(forms);
-  
-      return res.status(200).send({ data:  forms });
-    } catch (e) {
-      console.error("Error fetching forms:", e);
-      return res.status(500).send({ data: "Something went wrong while fetching the form" });
-    }
-
-  }
-
-
-  const indiaFollowUpInSales = async(req,res)=>{
-
-    try {
-      const isAdmin = req.user.name.toLowerCase().startsWith("admin");
-  
-      let query = {};
-  
-      if (isAdmin) {
-        const adminId = req.user.userId
-        query = { adminId: adminId, status: "Hot" ,leadStatus:"follow-up",businessStatus:"telesales"}; 
-      }
-      else{
-        const userState = req.user.state
-        query = { state:userState , status: "Hot" ,leadStatus:"follow-up",businessStatus:"telesales"}; 
-      }
-  
-      const forms = await Form.find(query)
-        .select({
-          brandName: 1,
-          restaurantMobileNumber: 1,
-          firmName: 1,
-          contactPersonname: 1,
-          designation: 1,
-          contactPersonNumber: 1,
-          city: 1,
-          followupTime: 1,
-          followupDate: 1,
-          videoRecord: 1,
-          videoFeatures: 1,
-        });
-        console.log(forms);
-  
-      return res.status(200).send({ data:  forms });
-    } catch (e) {
-      console.error("Error fetching forms:", e);
-      return res.status(500).send({ data: "Something went wrong while fetching the form" });
-    }
-
-  }
-
-
-  const indiaNewLeadsInSales =async(req,res)=>{
-
-    console.log("ooooppppppp");
-
-    try {
-      const isAdmin = req.user.name.toLowerCase().startsWith("admin");
-  
-      let query = {};
-  
-      if (isAdmin) {
-        const adminId = req.user.userId
-        query = { adminId: adminId, status: "Hot", leadStatus:"new-lead",businessStatus:"telesales"}; 
-      }
-      else{
-        const userState = req.user.state
-        console.log("ussssseeeee");
-        console.log(userState);
-        query = { state:userState , status: "Hot", leadStatus:"new-lead",businessStatus:"telesales"}; 
-      }
-  
-      const forms = await Form.find(query)
-        .select({
-          brandName: 1,
-          restaurantMobileNumber: 1,
-          firmName: 1,
-          contactPersonname: 1,
-          designation: 1,
-          contactPersonNumber: 1,
-          city: 1,
-          videoFeatures: 1,
-          videoRecord: 1
-        });
-        console.log(forms);
-  
-      return res.status(200).send({ data:  forms });
-    } catch (e) {
-      console.error("Error fetching forms:", e);
-      return res.status(500).send({ data: "Something went wrong while fetching the form" });
-    }
-
-  }
-
-
-  const indiaNotConnectedInSales = async(req,res)=> {
-
-    try {
-      const isAdmin = req.user.name.toLowerCase().startsWith("admin");
-  
-      let query = {};
-  
-      if (isAdmin) {
-        const adminId = req.user.userId
-        query = { adminId: adminId, status: "Hot", leadStatus:"not-connected" ,businessStatus:"telesales"}; 
-      }
-      else{
-        const userState = req.user.state
-        query = { state:userState , status: "Hot", leadStatus:"not-connected" ,businessStatus:"telesales"}; 
-      }
-  
-      const forms = await Form.find(query)
-        .select({
-          brandName: 1,
-          restaurantMobileNumber: 1,
-          firmName: 1,
-          contactPersonname: 1,
-          designation: 1,
-          contactPersonNumber: 1,
-          city: 1,
-          leadDescription: 1,
-        });
-        console.log(forms);
-  
-      return res.status(200).send({ data:  forms });
-    } catch (e) {
-      console.error("Error fetching forms:", e);
-      return res.status(500).send({ data: "Something went wrong while fetching the form" });
-    }
-  
-  }
-
-
-  const booksNewLeadInSales = async(req,res)=>{
-
-    try {
-      const isAdmin = req.user.name.toLowerCase().startsWith("admin");
-  
-      let query = {};
-  
-      if (isAdmin) {
-        const adminId = req.user.userId
-        query = { adminId: adminId, status: "Hot", booksLeadStatus:"new-lead",booksBusinessStatus:"telesales" ,billingSoftware:"no"}; 
-      }
-      else{
-        const userState = req.user.state
-        query = { state:userState , status: "Hot", booksLeadStatus:"new-lead",booksBusinessStatus:"telesales" ,billingSoftware:"no"}; 
-      }
-      const forms = await Form.find(query)
-        .select({
-          brandName: 1,
-          restaurantMobileNumber: 1,
-          firmName: 1,
-          contactPersonname: 1,
-          designation: 1,
-          contactPersonNumber: 1,
-          city: 1,
-          newLeadFeatures: 1,
-          businessStatus:1
-        });
-        console.log(forms);
-
-      return res.status(200).send({ data:  forms });
-    } catch (e) {
-      console.error("Error fetching forms:", e);
-      return res.status(500).send({ data: "Something went wrong while fetching the form" });
-    }
-
-  }
-
-
-  const booksFollowUpInSales = async(req,res)=>{
-    try {
-      const isAdmin = req.user.name.toLowerCase().startsWith("admin");
-  
-      let query = {};
-  
-      if (isAdmin) {
-        const adminId = req.user.userId
-        query = { adminId: adminId, status: "Hot" ,booksLeadStatus:"follow-up",booksBusinessStatus:"telesales" ,billingSoftware:"no"}; 
-      }
-      else{
-        const userState = req.user.state
-        query = { state:userState ,status: "Hot" ,booksLeadStatus:"follow-up",booksBusinessStatus:"telesales" ,billingSoftware:"no"}; 
-      }
-  
-      const forms = await Form.find(query)
-        .select({
-          brandName: 1,
-          restaurantMobileNumber: 1,
-          firmName: 1,
-          contactPersonname: 1,
-          designation: 1,
-          contactPersonNumber: 1,
-          city: 1,
-          leadDescription: 1,
-          followupTime: 1,
-          followupDate: 1,
-          callRecord: 1
-        });
-        console.log(forms);
-  
-      return res.status(200).send({ data:  forms });
-    } catch (e) {
-      console.error("Error fetching forms:", e);
-      return res.status(500).send({ data: "Something went wrong while fetching the form" });
-    }
-  }
-
-
-
-const booksConnectedInSales = async(req,res)=>{
-
-
+const myLeadsBooks = async (req, res) => {
   try {
     const isAdmin = req.user.name.toLowerCase().startsWith("admin");
 
     let query = {};
 
     if (isAdmin) {
-      const adminId = req.user.userId
-      query = { adminId: adminId, status: "Hot", booksLeadStatus:"connected",booksBusinessStatus:"telesales" ,billingSoftware:"no"}; 
+      const adminId = req.user.userId;
+      query = { adminId: adminId, billingSoftware: "no" };
+    } else {
+      const userState = req.user.state;
+      query = { state: userState, billingSoftware: "no" };
     }
-    else{
-      const userState = req.user.state
-      query = { state:userState , status: "Hot", booksLeadStatus:"connected",booksBusinessStatus:"telesales" ,billingSoftware:"no"}; 
-    }
+    const forms = await Form.find(query).select({
+      brandName: 1,
+      restaurantMobileNumber: 1,
+      firmName: 1,
+      contactPersonname: 1,
+      designation: 1,
+      contactPersonNumber: 1,
+      city: 1,
+    });
+    console.log(forms);
 
-    const forms = await Form.find(query)
-      .select({
-        brandName: 1,
-        restaurantMobileNumber: 1,
-        firmName: 1,
-        contactPersonname: 1,
-        designation: 1,
-        contactPersonNumber: 1,
-        city: 1,
-        leadDescription: 1,
-        callRecord:1,
-        features:1,
-        status: 1,
-        leadStatus: 1,        
-      });
-      console.log(forms);
-
-    return res.status(200).send({ data:  forms });
+    return res.status(200).send({ data: forms });
   } catch (e) {
     console.error("Error fetching forms:", e);
-    return res.status(500).send({ data: "Something went wrong while fetching the form" });
+    return res
+      .status(500)
+      .send({ data: "Something went wrong while fetching the form" });
   }
+};
 
-}
+const businessStatus = async (req, res) => {
+  try {
+    const { userId, newBusinessStatus, leadStatus } = req.body;
 
+    const data = await Form.updateMany(
+      { _id: userId },
+      {
+        $set: {
+          businessStatus: newBusinessStatus,
+          leadStatus: leadStatus,
+        },
+      }
+    );
+    res.status(200).json({});
+  } catch (e) {
+    console.error("Error updating forms:", e);
+    return res
+      .status(500)
+      .send({ data: "Something went wrong while updating the form" });
+  }
+};
 
-const booksNotConnectedInSales = async(req,res)=>{
+const addVideoFeature = async (req, res) => {
+  try {
+    const { featureName, featureDescription, id } = req.body;
 
+    const result = await Form.updateOne(
+      { _id: id },
+      {
+        $push: {
+          videoFeatures: { featureName, featureDescription },
+        },
+      }
+    );
 
+    return res.status(200).json({ data: result });
+  } catch (error) {
+    console.error("Error updating feature:", error);
+    return res.status(500).send("Something went wrong while updating feature");
+  }
+};
+
+const addIntroduction = async (req, res) => {
+  try {
+    const { featureName, featureDescription, id } = req.body;
+    console.log(req.body);
+
+    const result = await Form.updateOne(
+      { _id: id },
+      {
+        $push: {
+          introduction: { featureName, featureDescription },
+        },
+      }
+    );
+
+    console.log(result);
+
+    return res.status(200).json({ data: result });
+  } catch (error) {
+    console.error("Error updating feature:", error);
+    return res.status(500).send("Something went wrong while updating feature");
+  }
+};
+
+const salesBooks = async (req, res) => {
   try {
     const isAdmin = req.user.name.toLowerCase().startsWith("admin");
 
     let query = {};
 
     if (isAdmin) {
-      const adminId = req.user.userId
-      query = { adminId: adminId, status: "Hot", booksLeadStatus:"not-connected" ,booksBusinessStatus:"telesales",billingSoftware:"no"}; 
+      const adminId = req.user.userId;
+      query = {
+        adminId: adminId,
+        billingSoftware: "no",
+        businessStatus: "telesales",
+      };
+    } else {
+      const userState = req.user.state;
+      query = {
+        state: userState,
+        billingSoftware: "no",
+        businessStatus: "telesales",
+      };
     }
-    else{
-      const userState = req.user.state
-      query = { state:userState ,status: "Hot", booksLeadStatus:"not-connected" ,booksBusinessStatus:"telesales",billingSoftware:"no"}; 
-    }
+    const forms = await Form.find(query).select({
+      brandName: 1,
+      restaurantMobileNumber: 1,
+      firmName: 1,
+      contactPersonname: 1,
+      designation: 1,
+      contactPersonNumber: 1,
+      city: 1,
+    });
+    console.log(forms);
 
-    const forms = await Form.find(query)
-      .select({
-        brandName: 1,
-        restaurantMobileNumber: 1,
-        firmName: 1,
-        contactPersonname: 1,
-        designation: 1,
-        contactPersonNumber: 1,
-        city: 1,
-        leadDescription: 1,
-      });
-      console.log(forms);
-
-    return res.status(200).send({ data:  forms });
+    return res.status(200).send({ data: forms });
   } catch (e) {
     console.error("Error fetching forms:", e);
-    return res.status(500).send({ data: "Something went wrong while fetching the form" });
+    return res
+      .status(500)
+      .send({ data: "Something went wrong while fetching the form" });
   }
+};
 
+const SalesCampaignsIndia = async (req, res) => {
+  try {
+    const isAdmin = req.user.name.toLowerCase().startsWith("admin");
 
-}
+    let query = {};
 
+    if (isAdmin) {
+      console.log(req.user);
+      const adminId = req.user.userId;
+      query = { adminId: adminId, businessStatus: "telesales" };
+    } else {
+      const userState = req.user.state;
+      query = { state: userState, businessStatus: "telesales" };
+    }
 
+    const forms = await Form.find(query).select({
+      leadStatus: 1,
+      address: 1,
+    });
 
-const updateBooksStatus = async(req,res)=>{
+    const uniqueCitiesSet = new Set();
 
+    forms.forEach((form) => {
+      form.address.forEach((address) => {
+        uniqueCitiesSet.add(address.locationCity);
+      });
+    });
+
+    const uniqueCities = Array.from(uniqueCitiesSet);
+
+    return res.status(200).send({ data: { forms, uniqueCities } });
+  } catch (e) {
+    console.error("Error fetching forms:", e);
+    return res
+      .status(500)
+      .send({ data: "Something went wrong while fetching the form" });
+  }
+};
+
+const SalesCampaignsBooks = async (req, res) => {
+  try {
+    const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+
+    let query = {};
+
+    if (isAdmin) {
+      console.log(req.user);
+      const adminId = req.user.userId;
+      query = {
+        adminId: adminId,
+        billingSoftware: "no",
+        booksBusinessStatus: "telesales",
+      };
+    } else {
+      const userState = req.user.state;
+      query = {
+        state: userState,
+        billingSoftware: "no",
+        booksBusinessStatus: "telesales",
+      };
+    }
+
+    const forms = await Form.find(query).select({
+      booksLeadStatus: 1,
+      address: 1,
+    });
+
+    const uniqueCitiesSet = new Set();
+
+    forms.forEach((form) => {
+      form.address.forEach((address) => {
+        uniqueCitiesSet.add(address.locationCity);
+      });
+    });
+
+    const uniqueCities = Array.from(uniqueCitiesSet);
+
+    return res.status(200).send({ data: { forms, uniqueCities } });
+  } catch (e) {
+    console.error("Error fetching forms:", e);
+    return res
+      .status(500)
+      .send({ data: "Something went wrong while fetching the form" });
+  }
+};
+
+const booksConnectedInMarkrting = async (req, res) => {
+  try {
+    const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+
+    let query = {};
+
+    if (isAdmin) {
+      const adminId = req.user.userId;
+      query = {
+        adminId: adminId,
+        status: "Hot",
+        booksLeadStatus: "connected",
+        booksBusinessStatus: "telemarketing",
+        billingSoftware: "no",
+      };
+    } else {
+      const userState = req.user.state;
+      query = {
+        state: userState,
+        status: "Hot",
+        booksLeadStatus: "connected",
+        booksBusinessStatus: "telemarketing",
+        billingSoftware: "no",
+      };
+    }
+
+    const forms = await Form.find(query).select({
+      brandName: 1,
+      restaurantMobileNumber: 1,
+      firmName: 1,
+      contactPersonname: 1,
+      designation: 1,
+      contactPersonNumber: 1,
+      city: 1,
+      leadDescription: 1,
+      callRecord: 1,
+      features: 1,
+      status: 1,
+      leadStatus: 1,
+    });
+    console.log(forms);
+
+    return res.status(200).send({ data: forms });
+  } catch (e) {
+    console.error("Error fetching forms:", e);
+    return res
+      .status(500)
+      .send({ data: "Something went wrong while fetching the form" });
+  }
+};
+
+const booksFollowUpInMarkrting = async (req, res) => {
+  try {
+    const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+
+    let query = {};
+
+    if (isAdmin) {
+      const adminId = req.user.userId;
+      query = {
+        adminId: adminId,
+        status: "Hot",
+        booksLeadStatus: "follow-up",
+        booksBusinessStatus: "telemarketing",
+        billingSoftware: "no",
+      };
+    } else {
+      const userState = req.user.state;
+      query = {
+        state: userState,
+        status: "Hot",
+        booksLeadStatus: "follow-up",
+        booksBusinessStatus: "telemarketing",
+        billingSoftware: "no",
+      };
+    }
+
+    const forms = await Form.find(query).select({
+      brandName: 1,
+      restaurantMobileNumber: 1,
+      firmName: 1,
+      contactPersonname: 1,
+      designation: 1,
+      contactPersonNumber: 1,
+      city: 1,
+      leadDescription: 1,
+      followupTime: 1,
+      followupDate: 1,
+      callRecord: 1,
+    });
+    console.log(forms);
+
+    return res.status(200).send({ data: forms });
+  } catch (e) {
+    console.error("Error fetching forms:", e);
+    return res
+      .status(500)
+      .send({ data: "Something went wrong while fetching the form" });
+  }
+};
+
+const booksNewLeadInMarkrting = async (req, res) => {
+  try {
+    const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+
+    let query = {};
+
+    if (isAdmin) {
+      const adminId = req.user.userId;
+      query = {
+        adminId: adminId,
+        status: "Hot",
+        booksLeadStatus: "new-lead",
+        booksBusinessStatus: "telemarketing",
+        billingSoftware: "no",
+      };
+    } else {
+      const userState = req.user.state;
+      query = {
+        state: userState,
+        status: "Hot",
+        booksLeadStatus: "new-lead",
+        booksBusinessStatus: "telemarketing",
+        billingSoftware: "no",
+      };
+    }
+    const forms = await Form.find(query).select({
+      brandName: 1,
+      restaurantMobileNumber: 1,
+      firmName: 1,
+      contactPersonname: 1,
+      designation: 1,
+      contactPersonNumber: 1,
+      city: 1,
+      newLeadFeatures: 1,
+      businessStatus: 1,
+    });
+    console.log(forms);
+
+    return res.status(200).send({ data: forms });
+  } catch (e) {
+    console.error("Error fetching forms:", e);
+    return res
+      .status(500)
+      .send({ data: "Something went wrong while fetching the form" });
+  }
+};
+
+const booksNotConnectedInMarkrting = async (req, res) => {
+  try {
+    const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+
+    let query = {};
+
+    if (isAdmin) {
+      const adminId = req.user.userId;
+      query = {
+        adminId: adminId,
+        status: "Hot",
+        booksLeadStatus: "not-connected",
+        booksBusinessStatus: "telemarketing",
+        billingSoftware: "no",
+      };
+    } else {
+      const userState = req.user.state;
+      query = {
+        state: userState,
+        status: "Hot",
+        booksLeadStatus: "not-connected",
+        booksBusinessStatus: "telemarketing",
+        billingSoftware: "no",
+      };
+    }
+
+    const forms = await Form.find(query).select({
+      brandName: 1,
+      restaurantMobileNumber: 1,
+      firmName: 1,
+      contactPersonname: 1,
+      designation: 1,
+      contactPersonNumber: 1,
+      city: 1,
+      leadDescription: 1,
+    });
+    console.log(forms);
+
+    return res.status(200).send({ data: forms });
+  } catch (e) {
+    console.error("Error fetching forms:", e);
+    return res
+      .status(500)
+      .send({ data: "Something went wrong while fetching the form" });
+  }
+};
+
+const indiaConnectedInSales = async (req, res) => {
+  try {
+    const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+
+    let query = {};
+
+    if (isAdmin) {
+      const adminId = req.user.userId;
+      query = {
+        adminId: adminId,
+        status: "Hot",
+        leadStatus: "connected",
+        businessStatus: "telesales",
+      };
+    } else {
+      const userState = req.user.state;
+      query = {
+        state: userState,
+        status: "Hot",
+        leadStatus: "connected",
+        businessStatus: "telesales",
+      };
+    }
+
+    const forms = await Form.find(query).select({
+      brandName: 1,
+      restaurantMobileNumber: 1,
+      firmName: 1,
+      contactPersonname: 1,
+      designation: 1,
+      contactPersonNumber: 1,
+      city: 1,
+      leadDescription: 1,
+      videoRecord: 1,
+      status: 1,
+      leadStatus: 1,
+      videoFeatures: 1,
+      businessStatus: 1,
+    });
+    console.log(forms);
+
+    return res.status(200).send({ data: forms });
+  } catch (e) {
+    console.error("Error fetching forms:", e);
+    return res
+      .status(500)
+      .send({ data: "Something went wrong while fetching the form" });
+  }
+};
+
+const indiaFollowUpInSales = async (req, res) => {
+  try {
+    const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+
+    let query = {};
+
+    if (isAdmin) {
+      const adminId = req.user.userId;
+      query = {
+        adminId: adminId,
+        status: "Hot",
+        leadStatus: "follow-up",
+        businessStatus: "telesales",
+      };
+    } else {
+      const userState = req.user.state;
+      query = {
+        state: userState,
+        status: "Hot",
+        leadStatus: "follow-up",
+        businessStatus: "telesales",
+      };
+    }
+
+    const forms = await Form.find(query).select({
+      brandName: 1,
+      restaurantMobileNumber: 1,
+      firmName: 1,
+      contactPersonname: 1,
+      designation: 1,
+      contactPersonNumber: 1,
+      city: 1,
+      followupTime: 1,
+      followupDate: 1,
+      videoRecord: 1,
+      videoFeatures: 1,
+    });
+    console.log(forms);
+
+    return res.status(200).send({ data: forms });
+  } catch (e) {
+    console.error("Error fetching forms:", e);
+    return res
+      .status(500)
+      .send({ data: "Something went wrong while fetching the form" });
+  }
+};
+
+const indiaNewLeadsInSales = async (req, res) => {
+  try {
+    const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+
+    let query = {};
+
+    if (isAdmin) {
+      const adminId = req.user.userId;
+      query = {
+        adminId: adminId,
+        status: "Hot",
+        leadStatus: "new-lead",
+        businessStatus: "telesales",
+      };
+    } else {
+      const userState = req.user.state;
+      console.log("ussssseeeee");
+      console.log(userState);
+      query = {
+        state: userState,
+        status: "Hot",
+        leadStatus: "new-lead",
+        businessStatus: "telesales",
+      };
+    }
+
+    const forms = await Form.find(query).select({
+      brandName: 1,
+      restaurantMobileNumber: 1,
+      firmName: 1,
+      contactPersonname: 1,
+      designation: 1,
+      contactPersonNumber: 1,
+      city: 1,
+      videoFeatures: 1,
+      videoRecord: 1,
+    });
+    console.log(forms);
+
+    return res.status(200).send({ data: forms });
+  } catch (e) {
+    console.error("Error fetching forms:", e);
+    return res
+      .status(500)
+      .send({ data: "Something went wrong while fetching the form" });
+  }
+};
+
+const indiaNotConnectedInSales = async (req, res) => {
+  try {
+    const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+
+    let query = {};
+
+    if (isAdmin) {
+      const adminId = req.user.userId;
+      query = {
+        adminId: adminId,
+        status: "Hot",
+        leadStatus: "not-connected",
+        businessStatus: "telesales",
+      };
+    } else {
+      const userState = req.user.state;
+      query = {
+        state: userState,
+        status: "Hot",
+        leadStatus: "not-connected",
+        businessStatus: "telesales",
+      };
+    }
+
+    const forms = await Form.find(query).select({
+      brandName: 1,
+      restaurantMobileNumber: 1,
+      firmName: 1,
+      contactPersonname: 1,
+      designation: 1,
+      contactPersonNumber: 1,
+      city: 1,
+      leadDescription: 1,
+    });
+    console.log(forms);
+
+    return res.status(200).send({ data: forms });
+  } catch (e) {
+    console.error("Error fetching forms:", e);
+    return res
+      .status(500)
+      .send({ data: "Something went wrong while fetching the form" });
+  }
+};
+
+const booksNewLeadInSales = async (req, res) => {
+  try {
+    const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+
+    let query = {};
+
+    if (isAdmin) {
+      const adminId = req.user.userId;
+      query = {
+        adminId: adminId,
+        status: "Hot",
+        booksLeadStatus: "new-lead",
+        booksBusinessStatus: "telesales",
+        billingSoftware: "no",
+      };
+    } else {
+      const userState = req.user.state;
+      query = {
+        state: userState,
+        status: "Hot",
+        booksLeadStatus: "new-lead",
+        booksBusinessStatus: "telesales",
+        billingSoftware: "no",
+      };
+    }
+    const forms = await Form.find(query).select({
+      brandName: 1,
+      restaurantMobileNumber: 1,
+      firmName: 1,
+      contactPersonname: 1,
+      designation: 1,
+      contactPersonNumber: 1,
+      city: 1,
+      newLeadFeatures: 1,
+      businessStatus: 1,
+    });
+    console.log(forms);
+
+    return res.status(200).send({ data: forms });
+  } catch (e) {
+    console.error("Error fetching forms:", e);
+    return res
+      .status(500)
+      .send({ data: "Something went wrong while fetching the form" });
+  }
+};
+
+const booksFollowUpInSales = async (req, res) => {
+  try {
+    const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+
+    let query = {};
+
+    if (isAdmin) {
+      const adminId = req.user.userId;
+      query = {
+        adminId: adminId,
+        status: "Hot",
+        booksLeadStatus: "follow-up",
+        booksBusinessStatus: "telesales",
+        billingSoftware: "no",
+      };
+    } else {
+      const userState = req.user.state;
+      query = {
+        state: userState,
+        status: "Hot",
+        booksLeadStatus: "follow-up",
+        booksBusinessStatus: "telesales",
+        billingSoftware: "no",
+      };
+    }
+
+    const forms = await Form.find(query).select({
+      brandName: 1,
+      restaurantMobileNumber: 1,
+      firmName: 1,
+      contactPersonname: 1,
+      designation: 1,
+      contactPersonNumber: 1,
+      city: 1,
+      leadDescription: 1,
+      followupTime: 1,
+      followupDate: 1,
+      callRecord: 1,
+    });
+    console.log(forms);
+
+    return res.status(200).send({ data: forms });
+  } catch (e) {
+    console.error("Error fetching forms:", e);
+    return res
+      .status(500)
+      .send({ data: "Something went wrong while fetching the form" });
+  }
+};
+
+const booksConnectedInSales = async (req, res) => {
+  try {
+    const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+
+    let query = {};
+
+    if (isAdmin) {
+      const adminId = req.user.userId;
+      query = {
+        adminId: adminId,
+        status: "Hot",
+        booksLeadStatus: "connected",
+        booksBusinessStatus: "telesales",
+        billingSoftware: "no",
+      };
+    } else {
+      const userState = req.user.state;
+      query = {
+        state: userState,
+        status: "Hot",
+        booksLeadStatus: "connected",
+        booksBusinessStatus: "telesales",
+        billingSoftware: "no",
+      };
+    }
+
+    const forms = await Form.find(query).select({
+      brandName: 1,
+      restaurantMobileNumber: 1,
+      firmName: 1,
+      contactPersonname: 1,
+      designation: 1,
+      contactPersonNumber: 1,
+      city: 1,
+      leadDescription: 1,
+      callRecord: 1,
+      features: 1,
+      status: 1,
+      leadStatus: 1,
+    });
+    console.log(forms);
+
+    return res.status(200).send({ data: forms });
+  } catch (e) {
+    console.error("Error fetching forms:", e);
+    return res
+      .status(500)
+      .send({ data: "Something went wrong while fetching the form" });
+  }
+};
+
+const booksNotConnectedInSales = async (req, res) => {
+  try {
+    const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+
+    let query = {};
+
+    if (isAdmin) {
+      const adminId = req.user.userId;
+      query = {
+        adminId: adminId,
+        status: "Hot",
+        booksLeadStatus: "not-connected",
+        booksBusinessStatus: "telesales",
+        billingSoftware: "no",
+      };
+    } else {
+      const userState = req.user.state;
+      query = {
+        state: userState,
+        status: "Hot",
+        booksLeadStatus: "not-connected",
+        booksBusinessStatus: "telesales",
+        billingSoftware: "no",
+      };
+    }
+
+    const forms = await Form.find(query).select({
+      brandName: 1,
+      restaurantMobileNumber: 1,
+      firmName: 1,
+      contactPersonname: 1,
+      designation: 1,
+      contactPersonNumber: 1,
+      city: 1,
+      leadDescription: 1,
+    });
+    console.log(forms);
+
+    return res.status(200).send({ data: forms });
+  } catch (e) {
+    console.error("Error fetching forms:", e);
+    return res
+      .status(500)
+      .send({ data: "Something went wrong while fetching the form" });
+  }
+};
+
+const updateBooksStatus = async (req, res) => {
   console.log("result");
 
   try {
-    const {value,id} = req.body
+    const { value, id } = req.body;
     const result = await Form.updateOne(
       { _id: id },
       { $set: { booksLeadStatus: value } }
@@ -1356,57 +1515,13 @@ const updateBooksStatus = async(req,res)=>{
     return res.status(200).json({ data: result });
   } catch (error) {
     console.error("Error updating description:", error);
-    return res.status(500).send("Something went wrong while updating description");
+    return res
+      .status(500)
+      .send("Something went wrong while updating description");
   }
+};
 
-}
-
-
-
-const bdmCampaignsIndia = async(req,res)=>{
-  try {
-
-    const isAdmin = req.user.name.toLowerCase().startsWith("admin");
-
-    let query = {};
-
-    if (isAdmin) {
-      console.log(req.user);
-      const adminId = req.user.userId
-      query = { adminId: adminId, businessStatus:"bdm" }; 
-    }
-    else{
-      const userState = req.user.state
-      query = { state:userState ,businessStatus:"bdm"}; 
-    }
-
-    const forms = await Form.find(query)
-      .select({
-        leadStatus:1,
-        address:1
-      });
-
-      const uniqueCitiesSet = new Set();
-
-      forms.forEach(form => {
-        form.address.forEach(address => {
-          uniqueCitiesSet.add(address.locationCity);
-        });
-      });
-      
-      const uniqueCities = Array.from(uniqueCitiesSet);
-      
-      return res.status(200).send({data:{forms,uniqueCities}});
-
-  } catch (e) {
-    console.error("Error fetching forms:", e);
-    return res.status(500).send({ data: "Something went wrong while fetching the form" });
-  }
-}
-
-
-
-const bdmCampaignsBooks = async(req,res)=>{
+const bdmCampaignsIndia = async (req, res) => {
   try {
     const isAdmin = req.user.name.toLowerCase().startsWith("admin");
 
@@ -1414,306 +1529,109 @@ const bdmCampaignsBooks = async(req,res)=>{
 
     if (isAdmin) {
       console.log(req.user);
-      const adminId = req.user.userId
-      query = { adminId: adminId, billingSoftware:"no",booksBusinessStatus:"bdm"}; 
+      const adminId = req.user.userId;
+      query = { adminId: adminId, businessStatus: "bdm" };
+    } else {
+      const userState = req.user.state;
+      query = { state: userState, businessStatus: "bdm" };
     }
-    else{
-      const userState = req.user.state
-      query = { state:userState ,billingSoftware:"no",booksBusinessStatus:"bdm"}; 
-    }
-    
 
-    const forms = await Form.find(query)
-    .select({
-      booksLeadStatus:1,
-      address:1
+    const forms = await Form.find(query).select({
+      leadStatus: 1,
+      address: 1,
     });
 
     const uniqueCitiesSet = new Set();
 
-    forms.forEach(form => {
-      form.address.forEach(address => {
+    forms.forEach((form) => {
+      form.address.forEach((address) => {
         uniqueCitiesSet.add(address.locationCity);
       });
     });
-    
+
     const uniqueCities = Array.from(uniqueCitiesSet);
-    
-    return res.status(200).send({data:{forms,uniqueCities}});
+
+    return res.status(200).send({ data: { forms, uniqueCities } });
   } catch (e) {
     console.error("Error fetching forms:", e);
-    return res.status(500).send({ data: "Something went wrong while fetching the form" });
+    return res
+      .status(500)
+      .send({ data: "Something went wrong while fetching the form" });
   }
+};
 
-}
-
-
-
-const indiaConnectedInBdm = async(req,res)=>{
+const bdmCampaignsBooks = async (req, res) => {
   try {
     const isAdmin = req.user.name.toLowerCase().startsWith("admin");
 
     let query = {};
 
     if (isAdmin) {
-      const adminId = req.user.userId
-      query = { adminId: adminId, status: "Hot", leadStatus:"connected",businessStatus:"bdm"}; 
-    }
-    else{
-      const userState = req.user.state
-      query = { state:userState , status: "Hot", leadStatus:"connected",businessStatus:"bdm"}; 
+      console.log(req.user);
+      const adminId = req.user.userId;
+      query = {
+        adminId: adminId,
+        billingSoftware: "no",
+        booksBusinessStatus: "bdm",
+      };
+    } else {
+      const userState = req.user.state;
+      query = {
+        state: userState,
+        billingSoftware: "no",
+        booksBusinessStatus: "bdm",
+      };
     }
 
-    const forms = await Form.find(query)
-      .select({
-        brandName: 1,
-        restaurantMobileNumber: 1,
-        firmName: 1,
-        contactPersonname: 1,
-        designation: 1,
-        contactPersonNumber: 1,
-        city: 1,
-        leadDescription: 1,
-        status: 1,
-        leadStatus: 1,
-        bdmFeatures:1,
-        locationBdm:1        
+    const forms = await Form.find(query).select({
+      booksLeadStatus: 1,
+      address: 1,
+    });
+
+    const uniqueCitiesSet = new Set();
+
+    forms.forEach((form) => {
+      form.address.forEach((address) => {
+        uniqueCitiesSet.add(address.locationCity);
       });
-      console.log(forms);
+    });
 
-    return res.status(200).send({ data:  forms });
+    const uniqueCities = Array.from(uniqueCitiesSet);
+
+    return res.status(200).send({ data: { forms, uniqueCities } });
   } catch (e) {
     console.error("Error fetching forms:", e);
-    return res.status(500).send({ data: "Something went wrong while fetching the form" });
+    return res
+      .status(500)
+      .send({ data: "Something went wrong while fetching the form" });
   }
+};
 
-}
-
-
-
-
-
-const indiaFollowUpInBdm = async(req,res)=>{
-
+const indiaConnectedInBdm = async (req, res) => {
   try {
     const isAdmin = req.user.name.toLowerCase().startsWith("admin");
 
     let query = {};
 
     if (isAdmin) {
-      const adminId = req.user.userId
-      query = { adminId: adminId, status: "Hot" ,leadStatus:"follow-up",businessStatus:"bdm"}; 
-    }
-    else{
-      const userState = req.user.state
-      query = { state:userState ,status: "Hot" ,leadStatus:"follow-up",businessStatus:"bdm"}; 
-    }
-    const forms = await Form.find(query)
-      .select({
-        brandName: 1,
-        restaurantMobileNumber: 1,
-        firmName: 1,
-        contactPersonname: 1,
-        designation: 1,
-        contactPersonNumber: 1,
-        city: 1,
-        leadDescription: 1,
-        followupTime: 1,
-        followupDate: 1,
-        bdmFeatures:1,
-        locationBdm:1  
-      });
-      console.log(forms);
-
-    return res.status(200).send({ data:  forms });
-  } catch (e) {
-    console.error("Error fetching forms:", e);
-    return res.status(500).send({ data: "Something went wrong while fetching the form" });
-  }
-
-}
-
-
-const indiaNewLeadsInBdm =async(req,res)=>{
-
-  try {
-    const isAdmin = req.user.name.toLowerCase().startsWith("admin");
-
-    let query = {};
-
-    if (isAdmin) {
-      const adminId = req.user.userId
-      query = { adminId: adminId, status: "Hot", leadStatus:"new-lead",businessStatus:"bdm"}; 
-    }
-    else{
-      const userState = req.user.state
-      query = { state:userState , status: "Hot", leadStatus:"new-lead",businessStatus:"bdm"}; 
+      const adminId = req.user.userId;
+      query = {
+        adminId: adminId,
+        status: "Hot",
+        leadStatus: "connected",
+        businessStatus: "bdm",
+      };
+    } else {
+      const userState = req.user.state;
+      query = {
+        state: userState,
+        status: "Hot",
+        leadStatus: "connected",
+        businessStatus: "bdm",
+      };
     }
 
-    const forms = await Form.find(query)
-      .select({
-        brandName: 1,
-        restaurantMobileNumber: 1,
-        firmName: 1,
-        contactPersonname: 1,
-        designation: 1,
-        contactPersonNumber: 1,
-        city: 1,
-        newLeadFeatures: 1,
-        bdmFeatures:1,
-        locationBdm:1  
-      });
-      console.log(forms);
-      console.log("forms");
-
-    return res.status(200).send({ data:  forms });
-  } catch (e) {
-    console.error("Error fetching forms:", e);
-    return res.status(500).send({ data: "Something went wrong while fetching the form" });
-  }
-
-}
-
-
-const indiaNotConnectedInBdm = async(req,res)=> {
-
-  try {
-    const isAdmin = req.user.name.toLowerCase().startsWith("admin");
-
-    let query = {};
-
-    if (isAdmin) {
-      const adminId = req.user.userId
-      query = { adminId: adminId, status: "Hot", leadStatus:"not-connected" ,businessStatus:"bdm"}; 
-    }
-    else{
-      const userState = req.user.state
-      query = { state:userState ,status: "Hot", leadStatus:"not-connected" ,businessStatus:"bdm"}; 
-    }
-
-    const forms = await Form.find(query)
-      .select({
-        brandName: 1,
-        restaurantMobileNumber: 1,
-        firmName: 1,
-        contactPersonname: 1,
-        designation: 1,
-        contactPersonNumber: 1,
-        city: 1,
-        leadDescription: 1,
-        bdmFeatures:1,
-        locationBdm:1  
-      });
-      console.log(forms);
-
-    return res.status(200).send({ data:  forms });
-  } catch (e) {
-    console.error("Error fetching forms:", e);
-    return res.status(500).send({ data: "Something went wrong while fetching the form" });
-  }
-
-}
-
-
-
-
-const booksNewLeadInBdm = async(req,res)=>{
-
-  try {
-    const isAdmin = req.user.name.toLowerCase().startsWith("admin");
-
-    let query = {};
-
-    if (isAdmin) {
-      const adminId = req.user.userId
-      query = { adminId: adminId, status: "Hot", booksLeadStatus:"new-lead",booksBusinessStatus:"bdm" ,billingSoftware:"no"}; 
-    }
-    else{
-      const userState = req.user.state
-      query = { state:userState ,status: "Hot", booksLeadStatus:"new-lead",booksBusinessStatus:"bdm" ,billingSoftware:"no"}; 
-    }
-
-    const forms = await Form.find(query)
-      .select({
-        brandName: 1,
-        restaurantMobileNumber: 1,
-        firmName: 1,
-        contactPersonname: 1,
-        designation: 1,
-        contactPersonNumber: 1,
-        city: 1,
-        newLeadFeatures: 1,
-        businessStatus:1
-      });
-      console.log(forms);
-
-    return res.status(200).send({ data:  forms });
-  } catch (e) {
-    console.error("Error fetching forms:", e);
-    return res.status(500).send({ data: "Something went wrong while fetching the form" });
-  }
-
-}
-
-
-const booksFollowUpInBdm = async(req,res)=>{
-  try {
-    const isAdmin = req.user.name.toLowerCase().startsWith("admin");
-
-    let query = {};
-
-    if (isAdmin) {
-      const adminId = req.user.userId
-      query = { adminId: adminId, status: "Hot" ,booksLeadStatus:"follow-up",booksBusinessStatus:"bdm" ,billingSoftware:"no"}; 
-    }
-    else{
-      const userState = req.user.state
-      query = { state:userState ,status: "Hot" ,booksLeadStatus:"follow-up",booksBusinessStatus:"bdm" ,billingSoftware:"no"}; 
-    }
-
-    const forms = await Form.find(query)
-      .select({
-        brandName: 1,
-        restaurantMobileNumber: 1,
-        firmName: 1,
-        contactPersonname: 1,
-        designation: 1,
-        contactPersonNumber: 1,
-        city: 1,
-        leadDescription: 1,
-        followupTime: 1,
-        followupDate: 1,
-        callRecord: 1
-      });
-      console.log(forms);
-
-    return res.status(200).send({ data:  forms });
-  } catch (e) {
-    console.error("Error fetching forms:", e);
-    return res.status(500).send({ data: "Something went wrong while fetching the form" });
-  }
-}
-
-
-
-const booksConnectedInBdm = async(req,res)=>{
-
-
-try {
-  const isAdmin = req.user.name.toLowerCase().startsWith("admin");
-
-  let query = {};
-
-  if (isAdmin) {
-    const adminId = req.user.userId
-    query = { adminId: adminId, status: "Hot", booksLeadStatus:"connected",booksBusinessStatus:"bdm" ,billingSoftware:"no"}; 
-  }
-  else{
-    const userState = req.user.state
-    query = { state:userState , status: "Hot", booksLeadStatus:"connected",booksBusinessStatus:"bdm" ,billingSoftware:"no"}; 
-  }
-  const forms = await Form.find(query)
-    .select({
+    const forms = await Form.find(query).select({
       brandName: 1,
       restaurantMobileNumber: 1,
       firmName: 1,
@@ -1722,40 +1640,342 @@ try {
       contactPersonNumber: 1,
       city: 1,
       leadDescription: 1,
-      callRecord:1,
-      features:1,
       status: 1,
-      leadStatus: 1,        
+      leadStatus: 1,
+      bdmFeatures: 1,
+      locationBdm: 1,
+      bdmSelfie: 1
     });
     console.log(forms);
 
-  return res.status(200).send({ data:  forms });
-} catch (e) {
-  console.error("Error fetching forms:", e);
-  return res.status(500).send({ data: "Something went wrong while fetching the form" });
-}
-
-}
-
-
-const booksNotConnectedInBdm = async(req,res)=>{
-
-
-try {
-  const isAdmin = req.user.name.toLowerCase().startsWith("admin");
-
-  let query = {};
-
-  if (isAdmin) {
-    const adminId = req.user.userId
-    query = { adminId: adminId, status: "Hot", booksLeadStatus:"not-connected" ,booksBusinessStatus:"bdm",billingSoftware:"no"}; 
+    return res.status(200).send({ data: forms });
+  } catch (e) {
+    console.error("Error fetching forms:", e);
+    return res
+      .status(500)
+      .send({ data: "Something went wrong while fetching the form" });
   }
-  else{
-    const userState = req.user.state
-    query = { state:userState ,status: "Hot", booksLeadStatus:"not-connected" ,booksBusinessStatus:"bdm",billingSoftware:"no"}; 
+};
+
+const indiaFollowUpInBdm = async (req, res) => {
+  try {
+    const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+
+    let query = {};
+
+    if (isAdmin) {
+      const adminId = req.user.userId;
+      query = {
+        adminId: adminId,
+        status: "Hot",
+        leadStatus: "follow-up",
+        businessStatus: "bdm",
+      };
+    } else {
+      const userState = req.user.state;
+      query = {
+        state: userState,
+        status: "Hot",
+        leadStatus: "follow-up",
+        businessStatus: "bdm",
+      };
+    }
+    const forms = await Form.find(query).select({
+      brandName: 1,
+      restaurantMobileNumber: 1,
+      firmName: 1,
+      contactPersonname: 1,
+      designation: 1,
+      contactPersonNumber: 1,
+      city: 1,
+      leadDescription: 1,
+      followupTime: 1,
+      followupDate: 1,
+      bdmFeatures: 1,
+      locationBdm: 1,
+      bdmSelfie: 1
+    });
+    console.log(forms);
+
+    return res.status(200).send({ data: forms });
+  } catch (e) {
+    console.error("Error fetching forms:", e);
+    return res
+      .status(500)
+      .send({ data: "Something went wrong while fetching the form" });
   }
-  const forms = await Form.find(query)
-    .select({
+};
+
+const indiaNewLeadsInBdm = async (req, res) => {
+  try {
+    const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+
+    let query = {};
+
+    if (isAdmin) {
+      const adminId = req.user.userId;
+      query = {
+        adminId: adminId,
+        status: "Hot",
+        leadStatus: "new-lead",
+        businessStatus: "bdm",
+      };
+    } else {
+      const userState = req.user.state;
+      query = {
+        state: userState,
+        status: "Hot",
+        leadStatus: "new-lead",
+        businessStatus: "bdm",
+      };
+    }
+
+    const forms = await Form.find(query).select({
+      brandName: 1,
+      restaurantMobileNumber: 1,
+      firmName: 1,
+      contactPersonname: 1,
+      designation: 1,
+      contactPersonNumber: 1,
+      city: 1,
+      newLeadFeatures: 1,
+      bdmFeatures: 1,
+      locationBdm: 1,
+      bdmSelfie: 1
+    });
+    console.log(forms);
+    console.log("forms");
+
+    return res.status(200).send({ data: forms });
+  } catch (e) {
+    console.error("Error fetching forms:", e);
+    return res
+      .status(500)
+      .send({ data: "Something went wrong while fetching the form" });
+  }
+};
+
+const indiaNotConnectedInBdm = async (req, res) => {
+  try {
+    const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+
+    let query = {};
+
+    if (isAdmin) {
+      const adminId = req.user.userId;
+      query = {
+        adminId: adminId,
+        status: "Hot",
+        leadStatus: "not-connected",
+        businessStatus: "bdm",
+      };
+    } else {
+      const userState = req.user.state;
+      query = {
+        state: userState,
+        status: "Hot",
+        leadStatus: "not-connected",
+        businessStatus: "bdm",
+      };
+    }
+
+    const forms = await Form.find(query).select({
+      brandName: 1,
+      restaurantMobileNumber: 1,
+      firmName: 1,
+      contactPersonname: 1,
+      designation: 1,
+      contactPersonNumber: 1,
+      city: 1,
+      leadDescription: 1,
+      bdmFeatures: 1,
+      locationBdm: 1,
+    });
+    console.log(forms);
+
+    return res.status(200).send({ data: forms });
+  } catch (e) {
+    console.error("Error fetching forms:", e);
+    return res
+      .status(500)
+      .send({ data: "Something went wrong while fetching the form" });
+  }
+};
+
+const booksNewLeadInBdm = async (req, res) => {
+  try {
+    const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+
+    let query = {};
+
+    if (isAdmin) {
+      const adminId = req.user.userId;
+      query = {
+        adminId: adminId,
+        status: "Hot",
+        booksLeadStatus: "new-lead",
+        booksBusinessStatus: "bdm",
+        billingSoftware: "no",
+      };
+    } else {
+      const userState = req.user.state;
+      query = {
+        state: userState,
+        status: "Hot",
+        booksLeadStatus: "new-lead",
+        booksBusinessStatus: "bdm",
+        billingSoftware: "no",
+      };
+    }
+
+    const forms = await Form.find(query).select({
+      brandName: 1,
+      restaurantMobileNumber: 1,
+      firmName: 1,
+      contactPersonname: 1,
+      designation: 1,
+      contactPersonNumber: 1,
+      city: 1,
+      newLeadFeatures: 1,
+      businessStatus: 1,
+    });
+    console.log(forms);
+
+    return res.status(200).send({ data: forms });
+  } catch (e) {
+    console.error("Error fetching forms:", e);
+    return res
+      .status(500)
+      .send({ data: "Something went wrong while fetching the form" });
+  }
+};
+
+const booksFollowUpInBdm = async (req, res) => {
+  try {
+    const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+
+    let query = {};
+
+    if (isAdmin) {
+      const adminId = req.user.userId;
+      query = {
+        adminId: adminId,
+        status: "Hot",
+        booksLeadStatus: "follow-up",
+        booksBusinessStatus: "bdm",
+        billingSoftware: "no",
+      };
+    } else {
+      const userState = req.user.state;
+      query = {
+        state: userState,
+        status: "Hot",
+        booksLeadStatus: "follow-up",
+        booksBusinessStatus: "bdm",
+        billingSoftware: "no",
+      };
+    }
+
+    const forms = await Form.find(query).select({
+      brandName: 1,
+      restaurantMobileNumber: 1,
+      firmName: 1,
+      contactPersonname: 1,
+      designation: 1,
+      contactPersonNumber: 1,
+      city: 1,
+      leadDescription: 1,
+      followupTime: 1,
+      followupDate: 1,
+      callRecord: 1,
+    });
+    console.log(forms);
+
+    return res.status(200).send({ data: forms });
+  } catch (e) {
+    console.error("Error fetching forms:", e);
+    return res
+      .status(500)
+      .send({ data: "Something went wrong while fetching the form" });
+  }
+};
+
+const booksConnectedInBdm = async (req, res) => {
+  try {
+    const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+
+    let query = {};
+
+    if (isAdmin) {
+      const adminId = req.user.userId;
+      query = {
+        adminId: adminId,
+        status: "Hot",
+        booksLeadStatus: "connected",
+        booksBusinessStatus: "bdm",
+        billingSoftware: "no",
+      };
+    } else {
+      const userState = req.user.state;
+      query = {
+        state: userState,
+        status: "Hot",
+        booksLeadStatus: "connected",
+        booksBusinessStatus: "bdm",
+        billingSoftware: "no",
+      };
+    }
+    const forms = await Form.find(query).select({
+      brandName: 1,
+      restaurantMobileNumber: 1,
+      firmName: 1,
+      contactPersonname: 1,
+      designation: 1,
+      contactPersonNumber: 1,
+      city: 1,
+      leadDescription: 1,
+      callRecord: 1,
+      features: 1,
+      status: 1,
+      leadStatus: 1,
+    });
+    console.log(forms);
+
+    return res.status(200).send({ data: forms });
+  } catch (e) {
+    console.error("Error fetching forms:", e);
+    return res
+      .status(500)
+      .send({ data: "Something went wrong while fetching the form" });
+  }
+};
+
+const booksNotConnectedInBdm = async (req, res) => {
+  try {
+    const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+
+    let query = {};
+
+    if (isAdmin) {
+      const adminId = req.user.userId;
+      query = {
+        adminId: adminId,
+        status: "Hot",
+        booksLeadStatus: "not-connected",
+        booksBusinessStatus: "bdm",
+        billingSoftware: "no",
+      };
+    } else {
+      const userState = req.user.state;
+      query = {
+        state: userState,
+        status: "Hot",
+        booksLeadStatus: "not-connected",
+        booksBusinessStatus: "bdm",
+        billingSoftware: "no",
+      };
+    }
+    const forms = await Form.find(query).select({
       brandName: 1,
       restaurantMobileNumber: 1,
       firmName: 1,
@@ -1767,15 +1987,14 @@ try {
     });
     console.log(forms);
 
-  return res.status(200).send({ data:  forms });
-} catch (e) {
-  console.error("Error fetching forms:", e);
-  return res.status(500).send({ data: "Something went wrong while fetching the form" });
-}
-
-
-}
-
+    return res.status(200).send({ data: forms });
+  } catch (e) {
+    console.error("Error fetching forms:", e);
+    return res
+      .status(500)
+      .send({ data: "Something went wrong while fetching the form" });
+  }
+};
 
 const addBdmFeature = async (req, res) => {
   try {
@@ -1787,11 +2006,11 @@ const addBdmFeature = async (req, res) => {
       { _id: id },
       {
         $push: {
-          bdmFeatures: {featureName, featureDescription}
+          bdmFeatures: { featureName, featureDescription },
         },
       }
     );
-    
+
     return res.status(200).json({ data: result });
   } catch (error) {
     console.error("Error updating feature:", error);
@@ -1799,157 +2018,133 @@ const addBdmFeature = async (req, res) => {
   }
 };
 
-
-
-const updateBdmLocation=async(req,res)=>{
-
-  const {location} = req.body
+const updateBdmLocation = async (req, res) => {
+  const { location } = req.body;
   const { id } = req.params;
   try {
     const result = await Form.updateOne(
       { _id: id },
       {
         $set: {
-          locationBdm: location
+          locationBdm: location,
         },
       }
     );
-    
-    // const result = await Form.updateOne(id,{$push:{locationBdm:req.body.location}});
+
     return res.status(200).send({ data: result });
   } catch (e) {
     return res.status(500).send("Something went wrong while updating form");
   }
-}
+};
 
+const uploadSelfiPhoto = async (req, res) => {
+  const { id } = req.params;
+  const { originalname, buffer } = req.file;
 
-const uploadSelfiPhoto = async(req,res)=>{
+  const uniqueKey = (await generateRandomString(16)) + originalname;
+  console.log(uniqueKey);
 
-const { id } = req.params;
-const { originalname, buffer } = req.file;
+  const folderName = "bdmSelfie";
+  const key = `${folderName}/${uniqueKey}`;
+  const bucketName = process.env.BUCKET_NAME;
 
-const uniqueKey = (await generateRandomString(16)) + originalname;
-console.log(uniqueKey);
-
-const folderName = 'bdmSelfie'; 
-const key = `${folderName}/${uniqueKey}`;
-const bucketName = process.env.BUCKET_NAME;
-
-
-const s3Client = new S3Client({
-  region: process.env.REGION,
-  credentials: {
-    accessKeyId: process.env.ACCESS_KEYID,
-    secretAccessKey: process.env.SECRETACCESS_KEY,
-  },
-});
-
-try {
-  const response = await s3Client.send(
-    new PutObjectCommand({
-      Bucket: bucketName,
-      Key: key,
-      Body: buffer,
-    })
-  );
-  // Log the URL of the uploaded file
-  const fileUrl = `https://${bucketName}.s3.ap-south-1.amazonaws.com/${key}`;
-  console.log("File uploaded successfully:", fileUrl);
-
-  await Form.updateOne(
-    { _id: id },
-    { $set: { bdmSelfie: fileUrl} }
-  )
-
-  // Optionally, you can send the file URL as a response to the client
-  res.json({ fileUrl });
-
-} catch (error) {
-  console.error("Error uploading file to S3:", error);
-  res.status(500).json({ error: 'Failed to upload file' });
-}
-
-
-}
-
-
-const getPendingForm = async(req,res)=>{
+  const s3Client = new S3Client({
+    region: process.env.REGION,
+    credentials: {
+      accessKeyId: process.env.ACCESS_KEYID,
+      secretAccessKey: process.env.SECRETACCESS_KEY,
+    },
+  });
 
   try {
-    const {type} = req.params
-    const employeeId = req.user.userId
+    const response = await s3Client.send(
+      new PutObjectCommand({
+        Bucket: bucketName,
+        Key: key,
+        Body: buffer,
+      })
+    );
+    // Log the URL of the uploaded file
+    const fileUrl = `https://${bucketName}.s3.ap-south-1.amazonaws.com/${key}`;
+    console.log("File uploaded successfully:", fileUrl);
+
+    await Form.updateOne({ _id: id }, { $set: { bdmSelfie: fileUrl } });
+
+    // Optionally, you can send the file URL as a response to the client
+    res.json({ fileUrl });
+  } catch (error) {
+    console.error("Error uploading file to S3:", error);
+    res.status(500).json({ error: "Failed to upload file" });
+  }
+};
+
+const getPendingForm = async (req, res) => {
+  try {
+    const { type } = req.params;
+    const employeeId = req.user.userId;
 
     let query = {};
 
-
-    if(type==='india'){
+    if (type === "india") {
       console.log(type);
-      query = { 
-        employeeId: employeeId, 
+      query = {
+        employeeId: employeeId,
         businessStatus: "pending",
-        billingSoftware:"yes"  
-    }
-    }else{
+        billingSoftware: "yes",
+      };
+    } else {
       console.log(type);
-      query = { 
-        employeeId: employeeId, 
-        booksBusinessStatus: "pending"  
+      query = {
+        employeeId: employeeId,
+        booksBusinessStatus: "pending",
+      };
     }
-
-    } 
 
     const result = await Form.find(query);
-    console.log(result)
+    console.log(result);
     return res.status(200).send({ data: result });
   } catch (e) {
-    return res.status(500).send({ data: "Something went wrong while fetching the form" });
+    return res
+      .status(500)
+      .send({ data: "Something went wrong while fetching the form" });
   }
+};
 
-}
-
-
-
-const getCompletedForm = async(req,res)=>{
-
+const getCompletedForm = async (req, res) => {
   try {
-    const {type} = req.params
-    const employeeId = req.user.userId
+    const { type } = req.params;
+    const employeeId = req.user.userId;
 
     let query = {};
 
-
-    if(type==='india'){
+    if (type === "india") {
       console.log(type);
-      query = { 
-        employeeId: employeeId, 
+      query = {
+        employeeId: employeeId,
         businessStatus: "completed",
-        billingSoftware:"yes"  
-    }
-    }else{
+        billingSoftware: "yes",
+      };
+    } else {
       console.log(type);
-      query = { 
-        employeeId: employeeId, 
-        booksBusinessStatus: "completed"  
+      query = {
+        employeeId: employeeId,
+        booksBusinessStatus: "completed",
+      };
     }
-
-    } 
 
     const result = await Form.find(query);
     return res.status(200).send({ data: result });
   } catch (e) {
-    return res.status(500).send({ data: "Something went wrong while fetching the form" });
+    return res
+      .status(500)
+      .send({ data: "Something went wrong while fetching the form" });
   }
+};
 
-}
-
-
-
-
-const booksBusinessStatus = async(req,res)=>{
+const booksBusinessStatus = async (req, res) => {
   try {
-  
-    const {userId,newBusinessStatus,leadStatus} = req.body
-  
+    const { userId, newBusinessStatus, leadStatus } = req.body;
+
     const data = await Form.updateMany(
       { _id: userId },
       {
@@ -1958,82 +2153,723 @@ const booksBusinessStatus = async(req,res)=>{
           booksLeadStatus: leadStatus,
         },
       }
-    )
+    );
     res.status(200).json({});
-  
-  ;
-    
-  
   } catch (e) {
     console.error("Error updating forms:", e);
-    return res.status(500).send({ data: "Something went wrong while updating the form" });
+    return res
+      .status(500)
+      .send({ data: "Something went wrong while updating the form" });
   }
-  
-    }
-  
+};
 
+const updateStatus = async (req, res) => {
+  try {
+    const { value, id } = req.body;
 
-  const updateStatus = async(req,res)=>{
-    try {
-      const {value,id} = req.body
-
-      const result = await Form.updateOne(
-        { _id: id },
-        { $set: { status: value } }
-      );;
-      return res.status(200).json({ data: result });
-    } catch (error) {
-      console.error("Error updating description:", error);
-      return res.status(500).send("Something went wrong while updating description");
-    }
-
-
+    const result = await Form.updateOne(
+      { _id: id },
+      { $set: { status: value } }
+    );
+    return res.status(200).json({ data: result });
+  } catch (error) {
+    console.error("Error updating description:", error);
+    return res
+      .status(500)
+      .send("Something went wrong while updating description");
   }
+};
+
+const LegalManagementTasksIndia = async (req, res) => {
+  try {
+    const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+
+    let query = {};
+
+    if (isAdmin) {
+      console.log("admin");
+
+      const adminId = req.user.userId;
+      query = {
+        adminId: adminId,
+        status: "Hot",
+        businessStatus: "legalmanagement",
+      };
+    } else {
+
+      console.log("kjjjfdhhsjfhsf");
+      const userState = req.user.state;
+      console.log(userState)
+      query = {
+        state: userState,
+        status: "Hot",
+        businessStatus: "legalmanagement",
+      };
+    }
+
+    const forms = await Form.find(query).select({
+      brandName: 1,
+      locationLegal: 1,
+      legalDate: 1,
+      agreement: 1,
+      ecs: 1,
+      legalSelfie: 1,
+      diningAgreement: 1,
+      additionalAgreement: 1,
+      whoWeAre: 1,
+      termsAndConditions: 1,
+      paymentAcknowledgement: 1,
+      businessStatus: 1,
+      legalFollowUpDate: 1,
+      legalDescription: 1,
+      state: 1
+    });
+    console.log("forms");
+
+    console.log(forms);
+
+    return res.status(200).send({ data: forms });
+  } catch (e) {
+    console.error("Error fetching forms:", e);
+    return res
+      .status(500)
+      .send({ data: "Something went wrong while fetching the form" });
+  }
+};
+
+const uploadAgreement = async (req, res) => {
+
+  const { id } = req.params;
+  const { fieldName, followUpDate, location, description } = req.body;
+  const locationObject = JSON.parse(location);
+  let fileUrl = ""
+
+console.log("hiiiiuuuuuu");
 
 
-module.exports={
-  createForm,getForm,updateForm,getUsers,
-  updateUser,getAssignedIndia,deleteUser
-  ,getNewLeadsDataIndia,
-  updateLeadStatus,
-  followUpDetails,getFollowupLeadsDataIndia,
-  addFeature,getConnectedLeadsDataIndia,
-  getNotConnectedLeadsDataIndia,progressLeadsData
-  ,uploadCallRecord,
-  uploadImage,getAssignedBooks,myLeadsBooks,
-  businessStatus,uploadVideoRecord,addVideoFeature,
-  addIntroduction,salesBooks,SalesCampaignsIndia,
-  SalesCampaignsBooks,booksConnectedInMarkrting,
-  booksFollowUpInMarkrting,booksNewLeadInMarkrting,
-  booksNotConnectedInMarkrting,indiaConnectedInSales,
-  indiaFollowUpInSales,indiaNewLeadsInSales,
-  indiaNotConnectedInSales,booksNewLeadInSales,
-  booksFollowUpInSales,booksConnectedInSales,
-  booksNotConnectedInSales,updateBooksStatus,
-  bdmCampaignsBooks,bdmCampaignsIndia,indiaConnectedInBdm,
-  indiaFollowUpInBdm,indiaNewLeadsInBdm,indiaNotConnectedInBdm,
-  booksNewLeadInBdm,booksFollowUpInBdm,booksConnectedInBdm,
-  booksNotConnectedInBdm,addBdmFeature,updateBdmLocation,
-  uploadSelfiPhoto,getPendingForm,getCompletedForm,
-  booksBusinessStatus,updateStatus
+  try {
+
+
+    if (req.file) {
+
+      const { originalname, buffer } = req.file;
+      const uniqueKey = (await generateRandomString(16)) + originalname;
+      const folderName = fieldName;
+      const key = `${folderName}/${uniqueKey}`;
+      const bucketName = process.env.BUCKET_NAME;
+      const s3Client = new S3Client({
+        region: process.env.REGION,
+        credentials: {
+          accessKeyId: process.env.ACCESS_KEYID,
+          secretAccessKey: process.env.SECRETACCESS_KEY,
+        },
+      });
+
+      try {
+        const response = await s3Client.send(
+          new PutObjectCommand({
+            Bucket: bucketName,
+            Key: key,
+            Body: buffer,
+          })
+        );
+        fileUrl = `https://${bucketName}.s3.ap-south-1.amazonaws.com/${key}`;
+        console.log("File uploaded successfully:", fileUrl);
+      } catch (error) {
+        console.error("Error uploading file to S3:", error);
+        res.status(500).json({ error: "Failed to upload file" });
+      }
+    } 
+
+    if (fieldName === "agreement") {
+      try {
+        const agreement = {
+          location: locationObject,
+          description: description,
+          followUpDate: followUpDate,
+          document: fileUrl,
+        };
+        const result = await Form.findByIdAndUpdate(
+          id,
+          { $set: { agreement: agreement } },
+          { new: true }
+        );
+        return res.status(200).send({ data: result });
+      } catch (error) {
+        console.error("Error updating document:", error);
+      }
+    }
+
+    if (fieldName === "ecs") {
+      try {
+        const ecs = {
+          location: locationObject,
+          description: description,
+          followUpDate: followUpDate,
+          document: fileUrl,
+        };
+        const result = await Form.findByIdAndUpdate(
+          id,
+          { $set: { ecs: ecs } },
+          { new: true }
+        );
+        return res.status(200).send({ data: result });
+      } catch (error) {
+        console.error("Error updating document:", error);
+      }
+    }
+    if (fieldName === "legalSelfie") {
+      try {
+        const legalSelfie = {
+          location: locationObject,
+          description: description,
+          followUpDate: followUpDate,
+          document: fileUrl,
+        };
+        const result = await Form.findByIdAndUpdate(
+          id,
+          { $set: { legalSelfie: legalSelfie } },
+          { new: true }
+        );
+        return res.status(200).send({ data: result });
+      } catch (error) {
+        console.error("Error updating document:", error);
+      }    }
+    if (fieldName === "diningAgreement") {
+      try {
+        const diningAgreement = {
+          location: locationObject,
+          description: description,
+          followUpDate: followUpDate,
+          document: fileUrl,
+        };
+        const result = await Form.findByIdAndUpdate(
+          id,
+          { $set: { diningAgreement: diningAgreement } },
+          { new: true }
+        );
+        return res.status(200).send({ data: result });
+      } catch (error) {
+        console.error("Error updating document:", error);
+      }    }
+    if (fieldName === "additionalAgreement") {
+      try {
+        const additionalAgreement = {
+          location: locationObject,
+          description: description,
+          followUpDate: followUpDate,
+          document: fileUrl,
+        };
+        const result = await Form.findByIdAndUpdate(
+          id,
+          { $set: { additionalAgreement: additionalAgreement } },
+          { new: true }
+        );
+        return res.status(200).send({ data: result });
+      } catch (error) {
+        console.error("Error updating document:", error);
+      }
+    }
+    if (fieldName === "whoWeAre") {
+      try {
+        const whoWeAre = {
+          location: locationObject,
+          description: description,
+          followUpDate: followUpDate,
+          document: fileUrl,
+        };
+        const result = await Form.findByIdAndUpdate(
+          id,
+          { $set: { whoWeAre: whoWeAre } },
+          { new: true }
+        );
+        return res.status(200).send({ data: result });
+      } catch (error) {
+        console.error("Error updating document:", error);
+      }    }
+    if (fieldName === "termsAndConditions") {
+      try {
+        const termsAndConditions = {
+          location: locationObject,
+          description: description,
+          followUpDate: followUpDate,
+          document: fileUrl,
+        };
+        const result = await Form.findByIdAndUpdate(
+          id,
+          { $set: { termsAndConditions: termsAndConditions } },
+          { new: true }
+        );
+        return res.status(200).send({ data: result });
+      } catch (error) {
+        console.error("Error updating document:", error);
+      }
+    }
+
+    return res.status(200).json({});
+  } catch (error) {
+    console.error("Error uploading file to S3:", error);
+    res.status(500).json({ error: "Failed to upload file" });
+  }
+};
+
+
+
+const legalCampaignsIndia = async (req, res) => {
+  try {
+    const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+
+    let query = {};
+
+    if (isAdmin) {
+      console.log(req.user);
+      const adminId = req.user.userId;
+      query = {
+        adminId: adminId,
+        businessStatus: "legalmanagement",
+      };
+    } else {
+      const userState = req.user.state;
+      query = {
+        state: userState,
+        businessStatus: "legalmanagement",
+      };
+    }
+
+    const forms = await Form.find(query).select({
+      leadStatus: 1,
+      address: 1,
+    });
+
+    const uniqueCitiesSet = new Set();
+
+    forms.forEach((form) => {
+      form.address.forEach((address) => {
+        uniqueCitiesSet.add(address.locationCity);
+      });
+    });
+
+    const uniqueCities = Array.from(uniqueCitiesSet);
+
+    return res.status(200).send({ data: { forms, uniqueCities } });
+  } catch (e) {
+    console.error("Error fetching forms:", e);
+    return res
+      .status(500)
+      .send({ data: "Something went wrong while fetching the form" });
+  }
+};
+
+
+
+const legalCampaignsBooks = async(req,res)=>{
+  try {
+    const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+
+    let query = {};
+
+    if (isAdmin) {
+      console.log(req.user);
+      const adminId = req.user.userId;
+      query = {
+        adminId: adminId,
+        businessStatus: "legalmanagement",
+        billingSoftware: "no"
+      };
+    } else {
+      const userState = req.user.state;
+      query = {
+        state: userState,
+        businessStatus: "legalmanagement",
+        billingSoftware: "no"
+      };
+    }
+
+    const forms = await Form.find(query).select({
+      leadStatus: 1,
+      address: 1,
+    });
+
+    const uniqueCitiesSet = new Set();
+
+    forms.forEach((form) => {
+      form.address.forEach((address) => {
+        uniqueCitiesSet.add(address.locationCity);
+      });
+    });
+
+    const uniqueCities = Array.from(uniqueCitiesSet);
+
+    return res.status(200).send({ data: { forms, uniqueCities } });
+  } catch (e) {
+    console.error("Error fetching forms:", e);
+    return res
+      .status(500)
+      .send({ data: "Something went wrong while fetching the form" });
+  }
 }
 
 
 
 
 
+const accountCampaignsIndia = async(req,res)=>{
+  try {
+    const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+
+    let query = {};
+
+    if (isAdmin) {
+      console.log(req.user);
+      const adminId = req.user.userId;
+      query = {
+        adminId: adminId,
+        businessStatus: "accountsmanagement",
+      };
+    } else {
+      const userState = req.user.state;
+      query = {
+        state: userState,
+        businessStatus: "accountsmanagement",
+      };
+    }
+
+    const forms = await Form.find(query).select({
+      leadStatus: 1,
+      address: 1,
+    });
+
+    const uniqueCitiesSet = new Set();
+
+    forms.forEach((form) => {
+      form.address.forEach((address) => {
+        uniqueCitiesSet.add(address.locationCity);
+      });
+    });
+
+    const uniqueCities = Array.from(uniqueCitiesSet);
+
+    return res.status(200).send({ data: { forms, uniqueCities } });
+  } catch (e) {
+    console.error("Error fetching forms:", e);
+    return res
+      .status(500)
+      .send({ data: "Something went wrong while fetching the form" });
+  }
+}
+
+
+
+
+const accountCampaignsBooks = async(req,res)=>{
+  try {
+    const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+
+    let query = {};
+
+    if (isAdmin) {
+      console.log(req.user);
+      const adminId = req.user.userId;
+      query = {
+        adminId: adminId,
+        businessStatus: "accountsmanagement",
+        billingSoftware: "no"
+      };
+    } else {
+      const userState = req.user.state;
+      query = {
+        state: userState,
+        businessStatus: "accountsmanagement",
+        billingSoftware: "no"
+      };
+    }
+
+    const forms = await Form.find(query).select({
+      leadStatus: 1,
+      address: 1,
+    });
+
+    const uniqueCitiesSet = new Set();
+
+    forms.forEach((form) => {
+      form.address.forEach((address) => {
+        uniqueCitiesSet.add(address.locationCity);
+      });
+    });
+
+    const uniqueCities = Array.from(uniqueCitiesSet);
+
+    return res.status(200).send({ data: { forms, uniqueCities } });
+  } catch (e) {
+    console.error("Error fetching forms:", e);
+    return res
+      .status(500)
+      .send({ data: "Something went wrong while fetching the form" });
+  }
+}
+
+
+
+const accountsTaskIndia = async (req, res) => {
+  try {
+    const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+    const userState = req.user.state;
+
+    let query = {};
+
+    if (isAdmin) {
+      console.log("admin");
+
+      const adminId = req.user.userId;
+      query = {
+        adminId: adminId,
+        status: "Hot",
+        businessStatus: "accountsmanagement",
+      };
+
+    } else {
+      query = {
+        state: userState,
+        status: "Hot",
+        businessStatus: "accountsmanagement",
+      };
+    }
+
+    const forms = await Form.find(query).select({
+      brandName: 1,
+      trademark: 1,
+      paymentGateway: 1,
+      dlt: 1,
+      otherCharges: 1,
+      paymentAcknowledgement: 1,
+
+    });
+
+    console.log(forms);
+
+    return res.status(200).send({ data: forms });
+  } catch (e) {
+    console.error("Error fetching forms:", e);
+    return res
+      .status(500)
+      .send({ data: "Something went wrong while fetching the form" });
+  }
+};
+
+
+
+
+const uploadAccountsAgreement = async (req, res) => {
+
+  const { id } = req.params;
+  const { fieldName, followUpDate, location, description } = req.body;
+  const locationObject = JSON.parse(location);
+  let fileUrl = ""
+
+console.log("hiiiiuuuuuu");
+
+
+  try {
+
+
+    if (req.file) {
+
+      const { originalname, buffer } = req.file;
+      const uniqueKey = (await generateRandomString(16)) + originalname;
+      const folderName = fieldName;
+      const key = `${folderName}/${uniqueKey}`;
+      const bucketName = process.env.BUCKET_NAME;
+      const s3Client = new S3Client({
+        region: process.env.REGION,
+        credentials: {
+          accessKeyId: process.env.ACCESS_KEYID,
+          secretAccessKey: process.env.SECRETACCESS_KEY,
+        },
+      });
+
+      try {
+        const response = await s3Client.send(
+          new PutObjectCommand({
+            Bucket: bucketName,
+            Key: key,
+            Body: buffer,
+          })
+        );
+        fileUrl = `https://${bucketName}.s3.ap-south-1.amazonaws.com/${key}`;
+        console.log("File uploaded successfully:", fileUrl);
+      } catch (error) {
+        console.error("Error uploading file to S3:", error);
+        res.status(500).json({ error: "Failed to upload file" });
+      }
+    } 
+
+    if (fieldName === "trademark") {
+      try {
+        const trademark = {
+          location: locationObject,
+          description: description,
+          followUpDate: followUpDate,
+          document: fileUrl,
+        };
+        const result = await Form.findByIdAndUpdate(
+          id,
+          { $set: { trademark: trademark } },
+          { new: true }
+        );
+        return res.status(200).send({ data: result });
+      } catch (error) {
+        console.error("Error updating document:", error);
+      }
+    }
+
+    if (fieldName === "paymentGateway") {
+      try {
+        const paymentGateway = {
+          location: locationObject,
+          description: description,
+          followUpDate: followUpDate,
+          document: fileUrl,
+        };
+        const result = await Form.findByIdAndUpdate(
+          id,
+          { $set: { paymentGateway: paymentGateway } },
+          { new: true }
+        );
+        return res.status(200).send({ data: result });
+      } catch (error) {
+        console.error("Error updating document:", error);
+      }
+    }
+    if (fieldName === "dlt") {
+      try {
+        const dlt = {
+          location: locationObject,
+          description: description,
+          followUpDate: followUpDate,
+          document: fileUrl,
+        };
+        const result = await Form.findByIdAndUpdate(
+          id,
+          { $set: { dlt: dlt } },
+          { new: true }
+        );
+        return res.status(200).send({ data: result });
+      } catch (error) {
+        console.error("Error updating document:", error);
+      }    }
+    if (fieldName === "otherCharges") {
+      try {
+        const otherCharges = {
+          location: locationObject,
+          description: description,
+          followUpDate: followUpDate,
+          document: fileUrl,
+        };
+        const result = await Form.findByIdAndUpdate(
+          id,
+          { $set: { otherCharges: otherCharges } },
+          { new: true }
+        );
+        return res.status(200).send({ data: result });
+      } catch (error) {
+        console.error("Error updating document:", error);
+      }    }
+    if (fieldName === "paymentAcknowledgement") {
+      try {
+        const paymentAcknowledgement = {
+          location: locationObject,
+          description: description,
+          followUpDate: followUpDate,
+          document: fileUrl,
+        };
+        const result = await Form.findByIdAndUpdate(
+          id,
+          { $set: { paymentAcknowledgement: paymentAcknowledgement } },
+          { new: true }
+        );
+        return res.status(200).send({ data: result });
+      } catch (error) {
+        console.error("Error updating document:", error);
+      }
+    }
+    
+    return res.status(200).json({});
+  } catch (error) {
+    console.error("Error uploading file to S3:", error);
+    res.status(500).json({ error: "Failed to upload file" });
+  }
+};
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
+module.exports = {
+  createForm,
+  getForm,
+  getEditForm,
+  resetForm,
+  updateForm,
+  getUsers,
+  updateUser,
+  getAssignedIndia,
+  deleteUser,
+  getNewLeadsDataIndia,
+  updateLeadStatus,
+  followUpDetails,
+  getFollowupLeadsDataIndia,
+  addFeature,
+  getConnectedLeadsDataIndia,
+  getNotConnectedLeadsDataIndia,
+  progressLeadsData,
+  uploadCallRecord,
+  uploadImage,
+  getAssignedBooks,
+  myLeadsBooks,
+  businessStatus,
+  uploadVideoRecord,
+  addVideoFeature,
+  addIntroduction,
+  salesBooks,
+  SalesCampaignsIndia,
+  SalesCampaignsBooks,
+  booksConnectedInMarkrting,
+  booksFollowUpInMarkrting,
+  booksNewLeadInMarkrting,
+  booksNotConnectedInMarkrting,
+  indiaConnectedInSales,
+  indiaFollowUpInSales,
+  indiaNewLeadsInSales,
+  indiaNotConnectedInSales,
+  booksNewLeadInSales,
+  booksFollowUpInSales,
+  booksConnectedInSales,
+  booksNotConnectedInSales,
+  updateBooksStatus,
+  bdmCampaignsBooks,
+  bdmCampaignsIndia,
+  indiaConnectedInBdm,
+  indiaFollowUpInBdm,
+  indiaNewLeadsInBdm,
+  indiaNotConnectedInBdm,
+  booksNewLeadInBdm,
+  booksFollowUpInBdm,
+  booksConnectedInBdm,
+  booksNotConnectedInBdm,
+  addBdmFeature,
+  updateBdmLocation,
+  uploadSelfiPhoto,
+  getPendingForm,
+  getCompletedForm,
+  booksBusinessStatus,
+  updateStatus,
+  LegalManagementTasksIndia,
+  uploadAgreement,
+  legalCampaignsIndia,
+  legalCampaignsBooks,
+  accountCampaignsBooks,
+  accountCampaignsIndia,
+  accountsTaskIndia,
+  uploadAccountsAgreement,
+  getFormForEmployee
+};
