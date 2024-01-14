@@ -22,7 +22,11 @@ indiaFollowUpInBdm,indiaNewLeadsInBdm,indiaNotConnectedInBdm,
 booksNewLeadInBdm,booksFollowUpInBdm,booksConnectedInBdm,
 booksNotConnectedInBdm,addBdmFeature,updateBdmLocation,
 uploadSelfiPhoto,getPendingForm,getCompletedForm,
-booksBusinessStatus,updateStatus
+booksBusinessStatus,updateStatus,LegalManagementTasksIndia,
+uploadAgreement,legalCampaignsIndia,legalCampaignsBooks,
+accountCampaignsBooks,accountCampaignsIndia,accountsTaskIndia,
+uploadAccountsAgreement,resetForm,getEditForm,getFormForEmployee
+
 
 } = require("../controllers/formController");
 
@@ -46,8 +50,11 @@ console.log("routeee");
 
 router.post("/createform", createForm)
   .get("/getform/:category", getForm)
-  .get("/getusers",getUsers)
+  .get("/getformforemployee", getFormForEmployee)
+  .post("/resetform/:id",resetForm)
   .put("/updateform/:id", updateForm)
+  .get("/geteditform/:id", getEditForm)
+  .get("/getusers",getUsers)
   .post("/updateduser/:id",updateUser)
   .get("/getassignedindia",getAssignedIndia)
   .get("/getassignedbooks",getAssignedBooks)
@@ -107,7 +114,18 @@ router.post("/createform", createForm)
 
   .post("/updatestatus",updateStatus)
 
-  
+  .get("/legalmanagementtaskindia",LegalManagementTasksIndia)
+  .post("/uploadagreement/:id",upload.single('file'),uploadAgreement)
+  .get("/legalcampaignsindia",legalCampaignsIndia)
+  .get("/legalcampaignsbooks",legalCampaignsBooks)
 
+  
+  .get("/accountstaskindia",accountsTaskIndia)
+  .post("/uploadaccountsagreement/:id",upload.single('file'),uploadAccountsAgreement)
+  .get("/accountcampaignsindia",accountCampaignsIndia)
+  .get("/accountcampaignsbooks",accountCampaignsBooks)
+
+
+  
 
 module.exports = router;
