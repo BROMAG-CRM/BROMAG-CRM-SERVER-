@@ -37,7 +37,13 @@ const addDetailsEmployeeSchema = mongoose.Schema({
   tableCount: {
     type: Array,
   },
+  socialMedia: {
+    type: Array
+  },
   tablePhotos: {
+    type: Array,
+  },
+  menuPhotos: {
     type: Array,
   },
   billingSoftware: {
@@ -190,6 +196,163 @@ createdDate:{
   type:Date,
   default:Date.now
 },
+agreement: {
+  location: {
+    type: {
+      latitude: { type: Number },
+      longitude: { type: Number },
+      locationName: { type: String }
+    }
+  },
+  description: { type: String },
+  followUpDate: { type: String },
+  document: { type: String }
+},
+
+ecs:{
+  location: {
+    type: {
+      latitude: { type: Number },
+      longitude: { type: Number },
+      locationName: { type: String }
+    }
+  },
+  description: { type: String },
+  followUpDate: { type: String },
+  document: { type: String }
+},
+
+legalSelfie: {
+  location: {
+    type: {
+      latitude: { type: Number },
+      longitude: { type: Number },
+      locationName: { type: String }
+    }
+  },
+  description: { type: String },
+  followUpDate: { type: String },
+  document: { type: String }
+},
+
+diningAgreement: {
+  location: {
+    type: {
+      latitude: { type: Number },
+      longitude: { type: Number },
+      locationName: { type: String }
+    }
+  },
+  description: { type: String },
+  followUpDate: { type: String },
+  document: { type: String }
+},
+
+additionalAgreement: {
+  location: {
+    type: {
+      latitude: { type: Number },
+      longitude: { type: Number },
+      locationName: { type: String }
+    }
+  },
+  description: { type: String },
+  followUpDate: { type: String },
+  document: { type: String }
+},
+
+whoWeAre: {
+  location: {
+    type: {
+      latitude: { type: Number },
+      longitude: { type: Number },
+      locationName: { type: String }
+    }
+  },
+  description: { type: String },
+  followUpDate: { type: String },
+  document: { type: String }
+},
+
+termsAndConditions: {
+  location: {
+    type: {
+      latitude: { type: Number },
+      longitude: { type: Number },
+      locationName: { type: String }
+    }
+  },
+  description: { type: String },
+  followUpDate: { type: String },
+  document: { type: String }
+},
+
+trademark: {
+  location: {
+    type: {
+      latitude: { type: Number },
+      longitude: { type: Number },
+      locationName: { type: String }
+    }
+  },
+  description: { type: String },
+  followUpDate: { type: String },
+  document: { type: String }
+},
+
+paymentGateway: {
+  location: {
+    type: {
+      latitude: { type: Number },
+      longitude: { type: Number },
+      locationName: { type: String }
+    }
+  },
+  description: { type: String },
+  followUpDate: { type: String },
+  document: { type: String }
+},
+
+dlt: {
+  location: {
+    type: {
+      latitude: { type: Number },
+      longitude: { type: Number },
+      locationName: { type: String }
+    }
+  },
+  description: { type: String },
+  followUpDate: { type: String },
+  document: { type: String }
+},
+
+otherCharges: {
+  location: {
+    type: {
+      latitude: { type: Number },
+      longitude: { type: Number },
+      locationName: { type: String }
+    }
+  },
+  description: { type: String },
+  followUpDate: { type: String },
+  document: { type: String }
+},
+
+paymentAcknowledgement: {
+  location: {
+    type: {
+      latitude: { type: Number },
+      longitude: { type: Number },
+      locationName: { type: String }
+    }
+  },
+  description: { type: String },
+  followUpDate: { type: String },
+  document: { type: String }
+},
+
+
 
 
 });
