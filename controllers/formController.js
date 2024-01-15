@@ -27,22 +27,32 @@ const getForm = async (req, res) => {
       query = {
         adminId: adminId,
         firmOption: category,
-        // $or: [
-        //   { businessStatus: "telemarketing" },
-        //   { businessStatus: "telesales" },
-        //   { businessStatus: "bdm" },
-        // ],
+        $or: [
+          { businessStatus: "telemarketing" },
+          { businessStatus: "telesales" },
+          { businessStatus: "bdm" },
+          { businessStatus: "legalmanagement" },
+          { businessStatus: "accountsmanagement" },
+        ],
       };
-    } else {
+    }else if(req.user.role==='field sales executive') {
+      query = {
+        employeeId:req.user.userId,
+        businessStatus:'pending',       
+        firmOption: category,
+      }
+    }else{
       const userState = req.user.state;
       query = {
         state: userState,
         firmOption: category,
-        // $or: [
-        //   { businessStatus: "telemarketing" },
-        //   { businessStatus: "telesales" },
-        //   { businessStatus: "bdm" },
-        // ],
+        $or: [
+          { businessStatus: "telemarketing" },
+          { businessStatus: "telesales" },
+          { businessStatus: "bdm" },
+          { businessStatus: "legalmanagement" },
+          { businessStatus: "accountsmanagement" },
+        ],
       };
     }
 
