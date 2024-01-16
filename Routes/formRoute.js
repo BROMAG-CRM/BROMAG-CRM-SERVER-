@@ -25,7 +25,8 @@ uploadSelfiPhoto,getPendingForm,getCompletedForm,
 booksBusinessStatus,updateStatus,LegalManagementTasksIndia,
 uploadAgreement,legalCampaignsIndia,legalCampaignsBooks,
 accountCampaignsBooks,accountCampaignsIndia,accountsTaskIndia,
-uploadAccountsAgreement,resetForm,getEditForm,getFormForEmployee
+uploadAccountsAgreement,resetForm,getEditForm,getFormForEmployee,
+getFormsCount
 
 
 } = require("../controllers/formController");
@@ -50,6 +51,7 @@ console.log("routeee");
 
 router.post("/createform", createForm)
   .get("/getform/:category", getForm)
+  .get("/getformscount", getFormsCount)
   .get("/getformforemployee", getFormForEmployee)
   .post("/resetform/:id",resetForm)
   .put("/updateform/:id", updateForm)

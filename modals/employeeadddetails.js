@@ -38,6 +38,9 @@ const addDetailsEmployeeSchema = mongoose.Schema({
     type: Array,
   },
   socialMedia: {
+    type: String
+  },
+  socialMediaLinks:{
     type: Array
   },
   tablePhotos: {
@@ -163,7 +166,7 @@ callRecord:{
 },
 businessStatus:{
   type:String,
-  default:"telemarketing"
+  default:"pending"
 },
 booksBusinessStatus:{
   type:String,
