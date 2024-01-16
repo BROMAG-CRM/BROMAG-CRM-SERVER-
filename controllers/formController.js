@@ -27,22 +27,32 @@ const getForm = async (req, res) => {
       query = {
         adminId: adminId,
         firmOption: category,
-        // $or: [
-        //   { businessStatus: "telemarketing" },
-        //   { businessStatus: "telesales" },
-        //   { businessStatus: "bdm" },
-        // ],
+        $or: [
+          { businessStatus: "telemarketing" },
+          { businessStatus: "telesales" },
+          { businessStatus: "bdm" },
+          { businessStatus: "legalmanagement" },
+          { businessStatus: "accountsmanagement" },
+        ],
       };
-    } else {
+    }else if(req.user.role==='field sales executive') {
+      query = {
+        employeeId:req.user.userId,
+        businessStatus:'pending',       
+        firmOption: category,
+      }
+    }else{
       const userState = req.user.state;
       query = {
         state: userState,
         firmOption: category,
-        // $or: [
-        //   { businessStatus: "telemarketing" },
-        //   { businessStatus: "telesales" },
-        //   { businessStatus: "bdm" },
-        // ],
+        $or: [
+          { businessStatus: "telemarketing" },
+          { businessStatus: "telesales" },
+          { businessStatus: "bdm" },
+          { businessStatus: "legalmanagement" },
+          { businessStatus: "accountsmanagement" },
+        ],
       };
     }
 
@@ -55,6 +65,53 @@ const getForm = async (req, res) => {
   }
 };
 
+
+const getFormsCount = async(req,res)=>{
+  try {
+
+    const isAdmin = req.user.name.toLowerCase().startsWith("admin");
+
+    let query = {};
+
+    if (isAdmin) {
+      const adminId = req.user.userId;
+      query = {
+        adminId: adminId,
+        $or: [
+          { businessStatus: "telemarketing" },
+          { businessStatus: "telesales" },
+          { businessStatus: "bdm" },
+          { businessStatus: "legalmanagement" },
+          { businessStatus: "accountsmanagement" },
+        ],
+      };
+    }else if(req.user.role==='field sales executive') {
+      query = {
+        employeeId:req.user.userId,
+        businessStatus:'pending',       
+      }
+    }else{
+      const userState = req.user.state;
+      query = {
+        state: userState,
+        $or: [
+          { businessStatus: "telemarketing" },
+          { businessStatus: "telesales" },
+          { businessStatus: "bdm" },
+          { businessStatus: "legalmanagement" },
+          { businessStatus: "accountsmanagement" },
+        ],
+      };
+    }
+
+    const result = await Form.find(query);
+    return res.status(200).send({ data: result });
+  } catch (e) {
+    return res
+      .status(500)
+      .send({ data: "Something went wrong while fetching the form" });
+  }
+}
 
 
 const getFormForEmployee = async (req, res) => {
@@ -2807,6 +2864,7 @@ console.log("hiiiiuuuuuu");
 module.exports = {
   createForm,
   getForm,
+  getFormsCount,
   getEditForm,
   resetForm,
   updateForm,
