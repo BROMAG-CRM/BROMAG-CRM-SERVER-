@@ -38,6 +38,9 @@ const addDetailsEmployeeSchema = mongoose.Schema({
     type: Array,
   },
   socialMedia: {
+    type: String
+  },
+  socialMediaLinks:{
     type: Array
   },
   tablePhotos: {
